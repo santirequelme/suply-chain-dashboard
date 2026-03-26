@@ -15,10 +15,6 @@ function seededRng(seed: number) {
   };
 }
 
-function pick<T>(arr: T[], rng: () => number): T {
-  return arr[Math.floor(rng() * arr.length)];
-}
-
 function randInt(min: number, max: number, rng: () => number) {
   return Math.floor(rng() * (max - min + 1)) + min;
 }

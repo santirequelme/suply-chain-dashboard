@@ -4,7 +4,7 @@ import DataTable from "@/components/ui/DataTable";
 import Badge from "@/components/ui/Badge";
 import DonutChart from "@/components/charts/DonutChart";
 import { useAppStore } from "@/store/useAppStore";
-import { formatCurrency, formatPercent } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import type { ColumnDef } from "@/components/ui/DataTable";
 import type { Product } from "@/types";
 
