@@ -1,6 +1,6 @@
 # Make2Flow — Supply Chain Analytics Dashboard
 
-A production-quality supply chain analytics dashboard built with React 18, TypeScript, Tailwind CSS, and Recharts. Features a Vision UI-inspired dark theme, fully responsive layout, and rich data exploration across facilities, suppliers, products, and shipments.
+A production-quality supply chain analytics dashboard built with React 18, TypeScript, Tailwind CSS, and Recharts. Features a Vision UI-inspired theme with a built-in dark/light mode toggle, fully responsive layout, and rich data exploration across facilities, suppliers, products, and shipments.
 
 ## Pencil design file: m2f-suply-chain-design.pen
 
@@ -52,7 +52,7 @@ Mock data (55 facilities, 22 suppliers, 120 products, 220 shipments) was generat
 - **Suppliers** — Star ratings, on-time delivery trend badges, defect rate color coding, aggregate summary chips
 - **Products** — Stock status color coding, lead time indicators, category donut chart, 120 products
 - **Shipments** — Multi-filter (status, carrier, year), value + quantity columns, trend chart, 220 records
-- **Dark mode toggle** — Persisted via Zustand + localStorage
+- **Dark/Light mode toggle** — Persisted via Zustand + localStorage
 - **Global search** — Topbar search feeds into the active table's search filter
 - **CSV Export** — Available on every data table
 - **Accessibility** — ARIA labels on all tables, navigation, form controls, and status badges
