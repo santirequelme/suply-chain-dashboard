@@ -2,12 +2,13 @@ import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Building2, Truck, Package, Ship } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Settings is NOT in mobile bottom nav — it's accessed via the top CTA button.
 const NAV_ITEMS = [
-  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/dashboard",  label: "Dashboard",  icon: LayoutDashboard },
+  { path: "/suppliers",  label: "Suppliers",  icon: Truck },
   { path: "/facilities", label: "Facilities", icon: Building2 },
-  { path: "/suppliers", label: "Suppliers", icon: Truck },
-  { path: "/products", label: "Products", icon: Package },
-  { path: "/shipments", label: "Shipments", icon: Ship },
+  { path: "/products",   label: "Products",   icon: Package },
+  { path: "/shipments",  label: "Shipments",  icon: Ship },
 ];
 
 export default function MobileBottomNav() {
