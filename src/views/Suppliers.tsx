@@ -1,14 +1,20 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   suppliers, products, shipments, getSuppliersByTier,
   getShipmentsFilteredByDate,
 } from "@/data";
 import { useAppStore } from "@/store/useAppStore";
+import { useSectionLoading } from "@/hooks/useLoading";
 import Badge from "@/components/ui/Badge";
 import FilterBar from "@/components/filters/FilterBar";
 import ActiveFilterChips from "@/components/filters/ActiveFilterChips";
 import MobileFilterSheet from "@/components/filters/MobileFilterSheet";
 import RevenueBarChart from "@/components/charts/RevenueBarChart";
+import {
+  SkeletonChart,
+  SkeletonTable,
+  LoadingSpinner,
+} from "@/components/ui/LoadingContent";
 import { formatCurrency, formatPercent, cn } from "@/lib/utils";
 import {
   TrendingUp, TrendingDown, Star, ChevronDown, ChevronUp,
@@ -133,6 +139,16 @@ export default function Suppliers() {
   const [sortKey, setSortKey] = useState("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
+  const kpiLoading = useSectionLoading();
+  const chartLoading = useSectionLoading();
+  const tableLoading = useSectionLoading();
+
+  useEffect(() => {
+    kpiLoading.showWithDuration(800, 2000);
+    chartLoading.showWithDuration(1000, 2500);
+    tableLoading.showWithDuration(1200, 2800);
+  }, [filters, globalSearch]);
+
   const tierData = useMemo(() => getSuppliersByTier().map((t) => ({ name: t.name, revenue: t.value })), []);
 
   const filteredByDate = useMemo(
@@ -208,21 +224,48 @@ export default function Suppliers() {
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { label: "Total Suppliers",  value: String(filtered.length) },
-          { label: "Active",           value: String(filtered.filter((s) => s.status === "active").length) },
-          { label: "Avg On-Time",      value: formatPercent(avgOnTime) },
-          { label: "Period Shipments", value: String(activeSupplierShipments) },
-        ].map(({ label, value }) => (
-          <div key={label} className="card px-4 py-3 text-center">
-            <p className="text-xl font-heading font-bold text-slate-900 dark:text-white">{value}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{label}</p>
-          </div>
-        ))}
+        {kpiLoading.isLoading ? (
+          <>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="card px-4 py-3 text-center">
+                <div className="h-7 w-20 mx-auto bg-slate-200 dark:bg-slate-700/50 animate-pulse rounded" />
+                <div className="h-3 w-24 mx-auto mt-2 bg-slate-200 dark:bg-slate-700/50 animate-pulse rounded" />
+              </div>
+            ))}
+          </>
+        ) : (
+          [
+            { label: "Total Suppliers",  value: String(filtered.length) },
+            { label: "Active",           value: String(filtered.filter((s) => s.status === "active").length) },
+            { label: "Avg On-Time",      value: formatPercent(avgOnTime) },
+            { label: "Period Shipments", value: String(activeSupplierShipments) },
+          ].map(({ label, value }) => (
+            <div key={label} className="card px-4 py-3 text-center">
+              <p className="text-xl font-heading font-bold text-slate-900 dark:text-white">{value}</p>
+              <p className="text-xs text-slate-400 mt-0.5">{label}</p>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Tier chart */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {chartLoading.isLoading && chartLoading.variant === "skeleton" ? (
+          <>
+            <SkeletonChart className="lg:col-span-2 h-[260px]" />
+            <SkeletonChart className="h-[260px]" />
+          </>
+        ) : chartLoading.isLoading ? (
+          <>
+            <div className="lg:col-span-2 flex items-center justify-center bg-slate-100 dark:bg-white/[0.02] rounded-lg">
+              <LoadingSpinner size="lg" />
+            </div>
+            <div className="flex items-center justify-center bg-slate-100 dark:bg-white/[0.02] rounded-lg">
+              <LoadingSpinner size="lg" />
+            </div>
+          </>
+        ) : (
+          <>
         <div className="lg:col-span-2">
           <RevenueBarChart data={tierData} title="Suppliers by Tier" valueLabel="Suppliers" isCurrency={false} />
         </div>
@@ -263,14 +306,24 @@ export default function Suppliers() {
             </div>
           </div>
         </div>
+          </>
+        )}
       </div>
 
       {/* Table */}
       <div className="card overflow-hidden">
         <div className="px-5 py-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
           <p className="text-sm font-semibold text-slate-900 dark:text-white">Suppliers</p>
-          <span className="text-xs text-slate-400">{filtered.length} records</span>
+          <span className="text-xs text-slate-400">{tableLoading.isLoading ? "—" : `${filtered.length} records`}</span>
         </div>
+        {tableLoading.isLoading && tableLoading.variant === "skeleton" ? (
+          <SkeletonTable rows={10} cols={6} />
+        ) : tableLoading.isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <LoadingSpinner size="lg" />
+          </div>
+        ) : (
+        <>
         {/* Mobile card list */}
         <div className="lg:hidden divide-y divide-slate-100 dark:divide-white/5">
           {paginated.map((s, idx) => {
@@ -410,6 +463,8 @@ export default function Suppliers() {
               </button>
             </div>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>

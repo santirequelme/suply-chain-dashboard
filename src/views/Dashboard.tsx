@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   getDashboardStats, getRevenueByCategory,
   getTopFacilitiesByRevenue, getMonthlyRevenueFiltered, getShipmentsFilteredByDate,
   facilityMap, productMap, supplierMap, CARBON_BY_PHASE,
 } from "@/data";
 import { useAppStore } from "@/store/useAppStore";
+import { useSectionLoading } from "@/hooks/useLoading";
 import KpiCard from "@/components/ui/KpiCard";
 import RevenueBarChart from "@/components/charts/RevenueBarChart";
 import ShipmentLineChart from "@/components/charts/ShipmentLineChart";
@@ -13,6 +14,12 @@ import Badge from "@/components/ui/Badge";
 import FilterBar from "@/components/filters/FilterBar";
 import ActiveFilterChips from "@/components/filters/ActiveFilterChips";
 import MobileFilterSheet from "@/components/filters/MobileFilterSheet";
+import {
+  SkeletonCard,
+  SkeletonChart,
+  SkeletonTable,
+  LoadingSpinner,
+} from "@/components/ui/LoadingContent";
 import { formatCurrency, formatPercent, formatDate, cn } from "@/lib/utils";
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import type { SortConfig } from "@/types";
@@ -26,6 +33,16 @@ export default function Dashboard() {
   const globalSearch = useAppStore((s) => s.globalSearch);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<SortConfig>({ key: "shippedAt", direction: "desc" });
+
+  const kpiLoading = useSectionLoading();
+  const chartsLoading = useSectionLoading();
+  const tableLoading = useSectionLoading();
+
+  useEffect(() => {
+    kpiLoading.showWithDuration(800, 2000);
+    chartsLoading.showWithDuration(1000, 2500);
+    tableLoading.showWithDuration(1200, 2800);
+  }, [filters, globalSearch]);
 
   const filteredShipments = useMemo(() => {
     let list = getShipmentsFilteredByDate(filters.dateRange.start, filters.dateRange.end);
@@ -178,19 +195,52 @@ export default function Dashboard() {
 
       {/* KPI Grid */}
       <section aria-label="Key performance indicators">
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-          {kpis.map((kpi) => <KpiCard key={kpi.label} {...kpi} />)}
-        </div>
+        {kpiLoading.isLoading && kpiLoading.variant === "skeleton" ? (
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonCard key={i} className="h-[130px]" />
+            ))}
+          </div>
+        ) : kpiLoading.isLoading ? (
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-[130px] flex items-center justify-center bg-slate-100 dark:bg-white/[0.02] rounded-lg">
+                <LoadingSpinner size="lg" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+            {kpis.map((kpi) => <KpiCard key={kpi.label} {...kpi} />)}
+          </div>
+        )}
       </section>
 
       {/* Alert chips */}
       <section className="grid grid-cols-3 gap-3" aria-label="Shipment status summary">
-        {alertChips.map(({ label, value, color }) => (
-          <div key={label} className="card px-4 py-3 flex items-center justify-between">
-            <span className="text-xs text-slate-500 dark:text-slate-400">{label}</span>
-            <span className={`font-heading text-xl font-bold ${color}`}>{value}</span>
-          </div>
-        ))}
+        {kpiLoading.isLoading ? (
+          <>
+            <div className="card px-4 py-3 flex items-center justify-between">
+              <SkeletonCard className="h-3 w-16" />
+              <SkeletonCard className="h-6 w-8" />
+            </div>
+            <div className="card px-4 py-3 flex items-center justify-between">
+              <SkeletonCard className="h-3 w-16" />
+              <SkeletonCard className="h-6 w-8" />
+            </div>
+            <div className="card px-4 py-3 flex items-center justify-between">
+              <SkeletonCard className="h-3 w-16" />
+              <SkeletonCard className="h-6 w-8" />
+            </div>
+          </>
+        ) : (
+          alertChips.map(({ label, value, color }) => (
+            <div key={label} className="card px-4 py-3 flex items-center justify-between">
+              <span className="text-xs text-slate-500 dark:text-slate-400">{label}</span>
+              <span className={`font-heading text-xl font-bold ${color}`}>{value}</span>
+            </div>
+          ))
+        )}
       </section>
 
       {/* Charts row 1 */}
@@ -199,16 +249,36 @@ export default function Dashboard() {
         aria-label="Revenue and shipment trends"
         style={{ minHeight: 280 }}
       >
-        <div className="lg:col-span-2">
-          <ShipmentLineChart data={filteredRevenue} title="Revenue & Shipments Trend" />
-        </div>
-        <DonutChart
-          data={CARBON_BY_PHASE}
-          title="Carbon Footprint by Cycle Phase"
-          centerValue="CO₂e"
-          centerLabel="% share"
-          formatter={(v) => `${v}%`}
-        />
+        {chartsLoading.isLoading && chartsLoading.variant === "skeleton" ? (
+          <>
+            <div className="lg:col-span-2">
+              <SkeletonChart className="h-[260px]" />
+            </div>
+            <SkeletonChart className="h-[260px]" />
+          </>
+        ) : chartsLoading.isLoading ? (
+          <>
+            <div className="lg:col-span-2 flex items-center justify-center bg-slate-100 dark:bg-white/[0.02] rounded-lg">
+              <LoadingSpinner size="lg" />
+            </div>
+            <div className="flex items-center justify-center bg-slate-100 dark:bg-white/[0.02] rounded-lg">
+              <LoadingSpinner size="lg" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="lg:col-span-2">
+              <ShipmentLineChart data={filteredRevenue} title="Revenue & Shipments Trend" />
+            </div>
+            <DonutChart
+              data={CARBON_BY_PHASE}
+              title="Carbon Footprint by Cycle Phase"
+              centerValue="CO₂e"
+              centerLabel="% share"
+              formatter={(v) => `${v}%`}
+            />
+          </>
+        )}
       </section>
 
       {/* Charts row 2 */}
@@ -217,12 +287,21 @@ export default function Dashboard() {
         aria-label="Facility revenue and category breakdown"
         style={{ minHeight: 260 }}
       >
-        <RevenueBarChart data={topFacilities} title="Top 8 Facilities by Revenue" />
-        <DonutChart
-          data={categoryRevenue}
-          title="Revenue by Product Category"
-          formatter={(v) => formatCurrency(v, true)}
-        />
+        {chartsLoading.isLoading ? (
+          <>
+            <SkeletonChart className="h-[260px]" />
+            <SkeletonChart className="h-[260px]" />
+          </>
+        ) : (
+          <>
+            <RevenueBarChart data={topFacilities} title="Top 8 Facilities by Revenue" />
+            <DonutChart
+              data={categoryRevenue}
+              title="Revenue by Product Category"
+              formatter={(v) => formatCurrency(v, true)}
+            />
+          </>
+        )}
       </section>
 
       {/* Recent shipments table */}
@@ -232,10 +311,18 @@ export default function Dashboard() {
             Recent Shipments
           </h2>
           <span className="text-xs text-slate-400 dark:text-slate-500">
-            {filteredShipments.length} results
+            {tableLoading.isLoading ? "—" : `${filteredShipments.length} results`}
           </span>
         </div>
 
+        {tableLoading.isLoading && tableLoading.variant === "skeleton" ? (
+          <SkeletonTable rows={8} cols={7} />
+        ) : tableLoading.isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <LoadingSpinner size="lg" />
+          </div>
+        ) : (
+        <>
         {/* Mobile card list */}
         <div className="lg:hidden divide-y divide-slate-100 dark:divide-white/5">
           {paginated.map((s, idx) => {
@@ -385,6 +472,8 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
+        )}
+        </>
         )}
       </section>
     </div>
