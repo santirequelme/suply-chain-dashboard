@@ -28,7 +28,7 @@ export default function MobileBottomNav() {
                   cn(
                     "nav-item flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 transition-all duration-200",
                     isActive
-                      ? "nav-active"
+                      ? "nav-active scale-105 -translate-y-1 shadow-lg shadow-brand/25"
                       : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                   )
                 }
