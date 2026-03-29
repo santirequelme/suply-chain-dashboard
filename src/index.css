@@ -227,6 +227,23 @@
     box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.035);
   }
 
+  /* Mobile bottom nav — same glass treatment as sidebar (horizontal strip) */
+  .mobile-nav-glass {
+    background: rgba(255, 255, 255, 0.94);
+    border-top: 1px solid rgba(203, 213, 225, 0.55);
+  }
+  .dark .mobile-nav-glass {
+    background: linear-gradient(
+      160deg,
+      rgba(5, 21, 63, 0.82) 0%,
+      rgba(7, 37, 97, 0.76) 100%
+    );
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  }
+
   /* ── Active nav item — glass + neumorphic hybrid ── */
   .nav-active {
     background: #4318FF !important;

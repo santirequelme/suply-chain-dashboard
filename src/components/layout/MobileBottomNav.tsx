@@ -14,13 +14,11 @@ const NAV_ITEMS = [
 export default function MobileBottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-20 lg:hidden" aria-label="Mobile navigation">
-      <div className="h-6 bg-gradient-to-t from-slate-50 dark:from-navy-950 to-transparent pointer-events-none" />
-      <div className={cn(
-        "border-t px-2 pb-safe",
-        "bg-white/95 border-slate-200",
-        "dark:bg-navy-950/95 dark:border-white/10",
-        "backdrop-blur-md"
-      )}>
+      <div
+        className="pointer-events-none h-6 bg-gradient-to-t from-white/95 to-transparent dark:from-[rgba(5,21,63,0.55)]"
+        aria-hidden="true"
+      />
+      <div className={cn("mobile-nav-glass px-2 pb-safe")}>
         <ul className="flex items-center justify-around" role="list">
           {NAV_ITEMS.map(({ path, label, icon: Icon }) => (
             <li key={path} className="flex-1">
@@ -28,24 +26,31 @@ export default function MobileBottomNav() {
                 to={path}
                 className={({ isActive }) =>
                   cn(
-                    "flex flex-col items-center gap-1 py-2.5 px-1 rounded-2xl mx-0.5 transition-all duration-200",
-                    isActive ? "text-white" : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
+                    "nav-item flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2.5 mx-0.5 transition-all duration-200",
+                    isActive
+                      ? "nav-active"
+                      : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                   )
                 }
                 aria-label={label}
               >
                 {({ isActive }) => (
                   <>
-                    <span className={cn(
-                      "flex items-center justify-center h-9 w-9 rounded-xl transition-all duration-200",
-                      isActive ? "bg-brand shadow-brand-glow" : "bg-transparent"
-                    )}>
-                      <Icon className={cn("h-5 w-5", !isActive && "text-slate-500 dark:text-slate-400")} aria-hidden="true" />
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl">
+                      <Icon
+                        className={cn(
+                          "h-5 w-5",
+                          !isActive && "text-slate-500 dark:text-slate-400"
+                        )}
+                        aria-hidden="true"
+                      />
                     </span>
-                    <span className={cn(
-                      "text-[10px] font-medium leading-none",
-                      isActive ? "text-brand dark:text-white" : "text-slate-400 dark:text-slate-500"
-                    )}>
+                    <span
+                      className={cn(
+                        "text-[10px] font-medium leading-none",
+                        isActive ? "text-white" : "text-slate-400 dark:text-slate-500"
+                      )}
+                    >
                       {label}
                     </span>
                   </>
