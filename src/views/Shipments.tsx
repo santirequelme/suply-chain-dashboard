@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
   shipments, productMap, supplierMap, facilityMap,
   getShipmentsFilteredByDate, getMonthlyRevenueFiltered,
@@ -9,10 +9,14 @@ import ShipmentLineChart from "@/components/charts/ShipmentLineChart";
 import FilterBar from "@/components/filters/FilterBar";
 import ActiveFilterChips from "@/components/filters/ActiveFilterChips";
 import MobileFilterSheet from "@/components/filters/MobileFilterSheet";
+import RouteMap from "@/components/map/RouteMap";
+import RouteDetailDrawer from "@/components/map/RouteDetailDrawer";
+import type { AggregatedRoute } from "@/components/map/RouteMap";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import {
   ChevronDown, ChevronUp, ChevronLeft, ChevronRight,
   MapPin, Package, TrendingDown, TrendingUp, Ship,
+  TableProperties, Globe,
 } from "lucide-react";
 
 const SHIPMENT_STATUSES = ["delivered", "in_transit", "pending", "delayed", "cancelled"];
@@ -118,6 +122,12 @@ export default function Shipments() {
   const [sortKey, setSortKey] = useState("shippedAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [carrierFilter, setCarrierFilter] = useState<string[]>([]);
+  const [viewMode, setViewMode] = useState<"table" | "map">("table");
+  const [selectedRoute, setSelectedRoute] = useState<AggregatedRoute | null>(null);
+
+  const handleRouteClick = useCallback((route: AggregatedRoute) => {
+    setSelectedRoute(route);
+  }, []);
 
   const trend = useMemo(
     () => getMonthlyRevenueFiltered(filters.dateRange.start, filters.dateRange.end),
@@ -232,6 +242,35 @@ export default function Shipments() {
         </div>
         <MobileFilterSheet statusOptions={SHIPMENT_STATUSES} />
         <ActiveFilterChips />
+        {/* View toggle */}
+        <div className="flex items-center bg-white dark:bg-navy-800 border border-slate-200 dark:border-white/10 rounded-lg p-0.5">
+          <button
+            onClick={() => setViewMode("table")}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
+              viewMode === "table"
+                ? "bg-brand text-white shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+            )}
+            aria-pressed={viewMode === "table"}
+          >
+            <TableProperties className="h-3.5 w-3.5" />
+            Table
+          </button>
+          <button
+            onClick={() => setViewMode("map")}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
+              viewMode === "map"
+                ? "bg-brand text-white shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+            )}
+            aria-pressed={viewMode === "map"}
+          >
+            <Globe className="h-3.5 w-3.5" />
+            Map
+          </button>
+        </div>
       </div>
 
       {/* KPI strip */}
@@ -266,12 +305,29 @@ export default function Shipments() {
         </div>
       </div>
 
+      {/* Map view */}
+      {viewMode === "map" && (
+        <>
+          <RouteMap
+            shipments={filtered}
+            onRouteClick={handleRouteClick}
+          />
+          <RouteDetailDrawer
+            route={selectedRoute}
+            onClose={() => setSelectedRoute(null)}
+          />
+        </>
+      )}
+
       {/* Line chart */}
+      {viewMode === "table" && (
       <div style={{ minHeight: 260 }}>
         <ShipmentLineChart data={trend} title="Shipment Revenue & Volume Trend" />
       </div>
+      )}
 
       {/* Table */}
+      {viewMode === "table" && (
       <div className="card overflow-hidden">
         <div className="px-5 py-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
           <p className="text-sm font-semibold text-slate-900 dark:text-white">Shipments</p>
@@ -432,6 +488,7 @@ export default function Shipments() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }
