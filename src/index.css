@@ -246,11 +246,18 @@
 
   /* ── Active nav item — glass + neumorphic hybrid ── */
   .nav-active {
-    background: #4318FF !important;
-    color: white !important;
+    background: linear-gradient(
+      135deg,
+      rgba(67, 24, 255, 0.20) 0%,
+      rgba(104, 60, 255, 0.15) 100%
+    ) !important;
+    border: 1px solid rgba(67, 24, 255, 0.25) !important;
     box-shadow:
-      0 4px 14px rgba(67, 24, 255, 0.40),
-      inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      0 0 16px rgba(67, 24, 255, 0.12),
+      0 2px 8px rgba(67, 24, 255, 0.08) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
   }
   .dark .nav-active {
     background: linear-gradient(
@@ -270,7 +277,7 @@
   /* Non-active nav hover */
   .nav-item { transition: all 0.18s ease; }
   .nav-item:hover:not(.nav-active) {
-    background: rgba(148, 163, 184, 0.09);
+    background: rgba(67, 24, 255, 0.08);
   }
   .dark .nav-item:hover:not(.nav-active) {
     background: rgba(255, 255, 255, 0.062);
