@@ -1,15 +1,21 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   products, supplierMap, facilityMap, shipments,
   getRevenueByCategory, getProductVolumeTrend,
 } from "@/data";
 import { useAppStore } from "@/store/useAppStore";
+import { useSectionLoading } from "@/hooks/useLoading";
 import Badge from "@/components/ui/Badge";
 import DonutChart from "@/components/charts/DonutChart";
 import ShipmentLineChart from "@/components/charts/ShipmentLineChart";
 import FilterBar from "@/components/filters/FilterBar";
 import ActiveFilterChips from "@/components/filters/ActiveFilterChips";
 import MobileFilterSheet from "@/components/filters/MobileFilterSheet";
+import {
+  SkeletonChart,
+  SkeletonTable,
+  LoadingSpinner,
+} from "@/components/ui/LoadingContent";
 import { formatCurrency, cn } from "@/lib/utils";
 import {
   ChevronDown, ChevronUp, ChevronLeft, ChevronRight,
@@ -121,6 +127,16 @@ export default function Products() {
   const [sortKey, setSortKey] = useState("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
+  const kpiLoading = useSectionLoading();
+  const chartLoading = useSectionLoading();
+  const tableLoading = useSectionLoading();
+
+  useEffect(() => {
+    kpiLoading.showWithDuration(800, 2000);
+    chartLoading.showWithDuration(1000, 2500);
+    tableLoading.showWithDuration(1200, 2800);
+  }, [filters, globalSearch]);
+
   // Volume trend for line chart (converted to MonthlyRevenue-like shape)
   const volumeTrend = useMemo(() => {
     return getProductVolumeTrend().slice(-12).map((d) => ({
@@ -213,21 +229,48 @@ export default function Products() {
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { label: "In Stock",     value: String(stockStats.inStock),     color: "text-success" },
-          { label: "Low Stock",    value: String(stockStats.lowStock),    color: "text-warning" },
-          { label: "Out of Stock", value: String(stockStats.outOfStock),  color: "text-danger" },
-          { label: "Discontinued", value: String(stockStats.discontinued),color: "text-slate-400" },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="card px-4 py-3 text-center">
-            <p className={cn("text-xl font-heading font-bold", color)}>{value}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{label}</p>
-          </div>
-        ))}
+        {kpiLoading.isLoading ? (
+          <>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="card px-4 py-3 text-center">
+                <div className="h-7 w-16 mx-auto bg-slate-200 dark:bg-slate-700/50 animate-pulse rounded" />
+                <div className="h-3 w-20 mx-auto mt-2 bg-slate-200 dark:bg-slate-700/50 animate-pulse rounded" />
+              </div>
+            ))}
+          </>
+        ) : (
+          [
+            { label: "In Stock",     value: String(stockStats.inStock),     color: "text-success" },
+            { label: "Low Stock",    value: String(stockStats.lowStock),    color: "text-warning" },
+            { label: "Out of Stock", value: String(stockStats.outOfStock),  color: "text-danger" },
+            { label: "Discontinued", value: String(stockStats.discontinued),color: "text-slate-400" },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="card px-4 py-3 text-center">
+              <p className={cn("text-xl font-heading font-bold", color)}>{value}</p>
+              <p className="text-xs text-slate-400 mt-0.5">{label}</p>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={{ minHeight: 260 }}>
+        {chartLoading.isLoading && chartLoading.variant === "skeleton" ? (
+          <>
+            <SkeletonChart className="lg:col-span-2 h-[260px]" />
+            <SkeletonChart className="h-[260px]" />
+          </>
+        ) : chartLoading.isLoading ? (
+          <>
+            <div className="lg:col-span-2 flex items-center justify-center bg-slate-100 dark:bg-white/[0.02] rounded-lg">
+              <LoadingSpinner size="lg" />
+            </div>
+            <div className="flex items-center justify-center bg-slate-100 dark:bg-white/[0.02] rounded-lg">
+              <LoadingSpinner size="lg" />
+            </div>
+          </>
+        ) : (
+          <>
         <div className="lg:col-span-2">
           <ShipmentLineChart
             data={volumeTrend}
@@ -241,14 +284,24 @@ export default function Products() {
           title="Revenue by Category"
           formatter={(v) => formatCurrency(v, true)}
         />
+          </>
+        )}
       </div>
 
       {/* Table */}
       <div className="card overflow-hidden">
         <div className="px-5 py-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
           <p className="text-sm font-semibold text-slate-900 dark:text-white">Products</p>
-          <span className="text-xs text-slate-400">{filtered.length} records</span>
+          <span className="text-xs text-slate-400">{tableLoading.isLoading ? "—" : `${filtered.length} records`}</span>
         </div>
+        {tableLoading.isLoading && tableLoading.variant === "skeleton" ? (
+          <SkeletonTable rows={10} cols={7} />
+        ) : tableLoading.isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <LoadingSpinner size="lg" />
+          </div>
+        ) : (
+        <>
         {/* Mobile card list */}
         <div className="lg:hidden divide-y divide-slate-100 dark:divide-white/5">
           {paginated.map((p, idx) => {
@@ -410,6 +463,8 @@ export default function Products() {
               </button>
             </div>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>

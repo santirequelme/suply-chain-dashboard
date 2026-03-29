@@ -41,6 +41,11 @@ interface AppStore {
   darkMode: boolean;
   toggleDarkMode: () => void;
 
+  /** When true, desktop sidebar is icon-only; default false = expanded. */
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  toggleSidebarCollapsed: () => void;
+
   globalSearch: string;
   setGlobalSearch: (q: string) => void;
 
@@ -58,6 +63,10 @@ export const useAppStore = create<AppStore>()(
       darkMode: true,
       toggleDarkMode: () => set((s) => ({ darkMode: !s.darkMode })),
 
+      sidebarCollapsed: false,
+      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+      toggleSidebarCollapsed: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+
       globalSearch: "",
       setGlobalSearch: (q) => set({ globalSearch: q }),
 
@@ -70,7 +79,11 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: "m2f-app-store",
-      partialize: (s) => ({ darkMode: s.darkMode, settings: s.settings }),
+      partialize: (s) => ({
+        darkMode: s.darkMode,
+        settings: s.settings,
+        sidebarCollapsed: s.sidebarCollapsed,
+      }),
     }
   )
 );

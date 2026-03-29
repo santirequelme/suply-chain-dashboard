@@ -427,8 +427,13 @@ export function getShipmentsFilteredByDate(start: string, end: string) {
 }
 
 export function getMonthlyRevenueFiltered(start: string, end: string) {
-  const sy = new Date(start).getFullYear();
-  const ey = new Date(end).getFullYear();
+  const ds = new Date(start);
+  const de = new Date(end);
+  const y0 = ds.getFullYear();
+  const y1 = de.getFullYear();
+  if (Number.isNaN(y0) || Number.isNaN(y1)) return [];
+  const sy = Math.min(y0, y1);
+  const ey = Math.max(y0, y1);
   return monthlyRevenue.filter((m) => m.year >= sy && m.year <= ey);
 }
 

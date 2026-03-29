@@ -1,18 +1,28 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   shipments, productMap, supplierMap, facilityMap,
   getShipmentsFilteredByDate, getMonthlyRevenueFiltered,
 } from "@/data";
 import { useAppStore } from "@/store/useAppStore";
+import { useSectionLoading } from "@/hooks/useLoading";
 import Badge from "@/components/ui/Badge";
 import ShipmentLineChart from "@/components/charts/ShipmentLineChart";
 import FilterBar from "@/components/filters/FilterBar";
 import ActiveFilterChips from "@/components/filters/ActiveFilterChips";
 import MobileFilterSheet from "@/components/filters/MobileFilterSheet";
+import RouteMap from "@/components/map/RouteMap";
+import RouteDetailDrawer from "@/components/map/RouteDetailDrawer";
+import type { AggregatedRoute } from "@/components/map/RouteMap";
+import {
+  SkeletonChart,
+  SkeletonTable,
+  LoadingSpinner,
+} from "@/components/ui/LoadingContent";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import {
   ChevronDown, ChevronUp, ChevronLeft, ChevronRight,
   MapPin, Package, TrendingDown, TrendingUp, Ship,
+  TableProperties, Globe,
 } from "lucide-react";
 
 const SHIPMENT_STATUSES = ["delivered", "in_transit", "pending", "delayed", "cancelled"];
@@ -118,6 +128,22 @@ export default function Shipments() {
   const [sortKey, setSortKey] = useState("shippedAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [carrierFilter, setCarrierFilter] = useState<string[]>([]);
+  const [viewMode, setViewMode] = useState<"table" | "map">("table");
+  const [selectedRoute, setSelectedRoute] = useState<AggregatedRoute | null>(null);
+
+  const kpiLoading = useSectionLoading();
+  const chartLoading = useSectionLoading();
+  const tableLoading = useSectionLoading();
+
+  useEffect(() => {
+    kpiLoading.showWithDuration(800, 2000);
+    chartLoading.showWithDuration(1000, 2500);
+    tableLoading.showWithDuration(1200, 2800);
+  }, [filters, globalSearch, carrierFilter]);
+
+  const handleRouteClick = useCallback((route: AggregatedRoute) => {
+    setSelectedRoute(route);
+  }, []);
 
   const trend = useMemo(
     () => getMonthlyRevenueFiltered(filters.dateRange.start, filters.dateRange.end),
@@ -232,10 +258,50 @@ export default function Shipments() {
         </div>
         <MobileFilterSheet statusOptions={SHIPMENT_STATUSES} />
         <ActiveFilterChips />
+        {/* View toggle */}
+        <div className="flex items-center bg-white dark:bg-navy-800 border border-slate-200 dark:border-white/10 rounded-lg p-0.5">
+          <button
+            onClick={() => setViewMode("table")}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
+              viewMode === "table"
+                ? "bg-brand text-white shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+            )}
+            aria-pressed={viewMode === "table"}
+          >
+            <TableProperties className="h-3.5 w-3.5" />
+            Table
+          </button>
+          <button
+            onClick={() => setViewMode("map")}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
+              viewMode === "map"
+                ? "bg-brand text-white shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+            )}
+            aria-pressed={viewMode === "map"}
+          >
+            <Globe className="h-3.5 w-3.5" />
+            Map
+          </button>
+        </div>
       </div>
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {kpiLoading.isLoading ? (
+          <>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="card px-4 py-3 text-center">
+                <div className="h-7 w-20 mx-auto bg-slate-200 dark:bg-slate-700/50 animate-pulse rounded" />
+                <div className="h-3 w-24 mx-auto mt-2 bg-slate-200 dark:bg-slate-700/50 animate-pulse rounded" />
+              </div>
+            ))}
+          </>
+        ) : (
+        <>
         <div className="card px-4 py-3 text-center">
           <div className="flex items-center justify-center gap-1 mb-0.5">
             <p className="text-xl font-heading font-bold text-slate-900 dark:text-white">{filtered.length}</p>
@@ -264,19 +330,54 @@ export default function Shipments() {
           </div>
           <p className="text-xs text-slate-400">Delayed / In Transit</p>
         </div>
+        </>
+        )}
       </div>
+
+      {/* Map view */}
+      {viewMode === "map" && (
+        <>
+          <RouteMap
+            shipments={filtered}
+            onRouteClick={handleRouteClick}
+          />
+          <RouteDetailDrawer
+            route={selectedRoute}
+            onClose={() => setSelectedRoute(null)}
+          />
+        </>
+      )}
 
       {/* Line chart */}
+      {viewMode === "table" && (
       <div style={{ minHeight: 260 }}>
-        <ShipmentLineChart data={trend} title="Shipment Revenue & Volume Trend" />
+        {chartLoading.isLoading && chartLoading.variant === "skeleton" ? (
+          <SkeletonChart className="h-[260px]" />
+        ) : chartLoading.isLoading ? (
+          <div className="h-[260px] flex items-center justify-center bg-slate-100 dark:bg-white/[0.02] rounded-lg">
+            <LoadingSpinner size="lg" />
+          </div>
+        ) : (
+          <ShipmentLineChart data={trend} title="Shipment Revenue & Volume Trend" />
+        )}
       </div>
+      )}
 
       {/* Table */}
+      {viewMode === "table" && (
       <div className="card overflow-hidden">
         <div className="px-5 py-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
           <p className="text-sm font-semibold text-slate-900 dark:text-white">Shipments</p>
-          <span className="text-xs text-slate-400">{filtered.length} records</span>
+          <span className="text-xs text-slate-400">{tableLoading.isLoading ? "—" : `${filtered.length} records`}</span>
         </div>
+        {tableLoading.isLoading && tableLoading.variant === "skeleton" ? (
+          <SkeletonTable rows={10} cols={10} />
+        ) : tableLoading.isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <LoadingSpinner size="lg" />
+          </div>
+        ) : (
+        <>
         {/* Mobile card list */}
         <div className="lg:hidden divide-y divide-slate-100 dark:divide-white/5">
           {paginated.map((s, idx) => {
@@ -431,7 +532,10 @@ export default function Shipments() {
             </div>
           </div>
         )}
+        </>
+        )}
       </div>
+      )}
     </div>
   );
 }

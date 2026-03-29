@@ -2,88 +2,386 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design tokens ──────────────────────────────────────────────────────────
+   Glass + Neumorphism CSS variables resolved per color scheme.
+   Values are deliberately subtle — heavy effects are intentionally avoided.
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: light dark;
+
+  /* Glassmorphism */
+  --glass-bg:      rgba(255, 255, 255, 0.82);
+  --glass-border:  rgba(255, 255, 255, 0.60);
+  --glass-blur:    blur(20px) saturate(160%);
+
+  /* Neumorphism — light */
+  --neu-shadow:
+    5px 8px 20px rgba(148, 163, 184, 0.38),
+    -3px -4px 12px rgba(255, 255, 255, 0.92);
+  --neu-hover-shadow:
+    8px 14px 30px rgba(148, 163, 184, 0.48),
+    -4px -5px 16px rgba(255, 255, 255, 0.98),
+    0 0 0 1px rgba(148, 163, 184, 0.07);
+  --neu-inset:
+    inset 3px 3px 8px rgba(148, 163, 184, 0.28),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.72);
+
+  /* KPI glow color — overridden per card via data-color */
+  --kpi-glow: rgba(67, 24, 255, 0.12);
+
+  /* Ambient background orbs */
+  --orb1: rgba(67,  24, 255, 0.045);
+  --orb2: rgba(1,  181, 116, 0.032);
+}
+
+.dark {
+  /* Glassmorphism */
+  --glass-bg:      rgba(15, 21, 53, 0.58);
+  --glass-border:  rgba(255, 255, 255, 0.07);
+  --glass-blur:    blur(24px) saturate(180%);
+
+  /* Neumorphism — dark */
+  --neu-shadow:
+    4px 6px 18px rgba(0, 0, 0, 0.58),
+    -2px -2px 8px rgba(255, 255, 255, 0.04);
+  --neu-hover-shadow:
+    6px 12px 30px rgba(0, 0, 0, 0.70),
+    -3px -3px 12px rgba(255, 255, 255, 0.055),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  --neu-inset:
+    inset 2px 3px 8px rgba(0, 0, 0, 0.52),
+    inset -1px -1px 4px rgba(255, 255, 255, 0.04);
+
+  /* KPI glow */
+  --kpi-glow: rgba(67, 24, 255, 0.16);
+
+  /* Ambient orbs — more visible on dark */
+  --orb1: rgba(67,  24, 255, 0.09);
+  --orb2: rgba(1,  181, 116, 0.055);
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────────────────── */
+
+/* Chart shimmer sweep — light wave across card on hover */
+@keyframes wave-sweep {
+  0%   { transform: translateX(-120%) skewX(-12deg); opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { transform: translateX(230%) skewX(-12deg); opacity: 0; }
+}
+
+/* KPI glow — soft breathing pulse while hovered */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.65; }
+  50%       { opacity: 1.00; }
+}
+
+/* Logo icon — gentle vertical bob */
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-2px); }
+}
+
+/* ─── Base layer ─────────────────────────────────────────────────────────── */
 @layer base {
-  :root {
-    color-scheme: light dark;
-  }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
 
-  /* Safe area for devices with home indicator (iPhone, etc.) */
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  * {
-    @apply border-slate-200 dark:border-white/10;
-  }
+  * { @apply border-slate-200 dark:border-white/10; }
 
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased
-           dark:bg-navy-900 dark:text-white;
+    @apply font-sans antialiased text-slate-900 dark:text-white;
+    /* Flat base colour + two subtle radial colour orbs for ambient depth */
+    background-color: #F8FAFC;
+    background-image:
+      radial-gradient(ellipse 70% 55% at 12% 82%, var(--orb1) 0%, transparent 100%),
+      radial-gradient(ellipse 55% 48% at 88% 12%, var(--orb2) 0%, transparent 100%);
+    min-height: 100vh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
+  .dark body {
+    background-color: #0F1535;
+    background-image:
+      radial-gradient(ellipse 70% 55% at 12% 82%, var(--orb1) 0%, transparent 100%),
+      radial-gradient(ellipse 55% 48% at 88% 12%, var(--orb2) 0%, transparent 100%);
   }
+
+  h1, h2, h3, h4, h5, h6 { @apply font-heading; }
 
   /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar       { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { @apply bg-slate-100 dark:bg-navy-950; }
   ::-webkit-scrollbar-thumb { @apply bg-slate-300 dark:bg-navy-600 rounded-full; }
   ::-webkit-scrollbar-thumb:hover { @apply bg-brand; }
 }
 
+/* ─── Components ─────────────────────────────────────────────────────────── */
 @layer components {
+
+  /* ── Card — glassmorphic surface with neumorphic outer depth ── */
   .card {
-    @apply bg-white border border-slate-200 rounded-2xl shadow-sm
-           dark:bg-navy-950 dark:border-white/10 dark:shadow-card;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;          /* rounded-2xl */
+    box-shadow: var(--neu-shadow);
+    transition: box-shadow 0.28s ease, transform 0.28s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Subtle top-edge catch-light streak */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 8%; right: 8%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.24) 35%,
+      rgba(255, 255, 255, 0.24) 65%,
+      transparent 100%
+    );
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
   }
 
+  /* ── KPI card — neumorphic lift + radial color glow on hover ── */
+  .kpi-card {
+    will-change: transform, box-shadow;
+    cursor: default;
+  }
+  /* Radial glow overlay fades in on hover */
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at 75% 15%,
+      var(--kpi-glow) 0%,
+      transparent 68%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .kpi-card:hover {
+    transform: translateY(-3px) scale(1.007);
+    box-shadow: var(--neu-hover-shadow);
+  }
+  .kpi-card:hover::after {
+    opacity: 1;
+    animation: glow-pulse 2.6s ease-in-out infinite;
+  }
+  /* Children above the glow layer */
+  .kpi-card > * { position: relative; z-index: 1; }
+
+  /* Per-color glow overrides */
+  .kpi-card[data-color="brand"]   { --kpi-glow: rgba(67,  24, 255, 0.14); }
+  .kpi-card[data-color="success"] { --kpi-glow: rgba(1,  181, 116, 0.12); }
+  .kpi-card[data-color="warning"] { --kpi-glow: rgba(255, 181,  71, 0.11); }
+  .kpi-card[data-color="danger"]  { --kpi-glow: rgba(229,  62,  62, 0.11); }
+
+  /* ── Chart card — light shimmer wave sweeps across on hover ── */
+  .chart-card::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -100%;
+    width: 52%;
+    background: linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.028) 30%,
+      rgba(255, 255, 255, 0.062) 50%,
+      rgba(255, 255, 255, 0.028) 70%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+    /* Paused until hover */
+    animation: wave-sweep 1.8s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+  .chart-card:hover::after {
+    animation-play-state: running;
+  }
+
+  /* ── Sidebar glass panel ── */
+  .sidebar-glass {
+    background: rgba(255, 255, 255, 0.94);
+    border-right: 1px solid rgba(203, 213, 225, 0.55);
+  }
+  .dark .sidebar-glass {
+    background: linear-gradient(
+      160deg,
+      rgba(5, 21, 63, 0.82) 0%,
+      rgba(7, 37, 97, 0.76) 100%
+    );
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border-right: 1px solid rgba(255, 255, 255, 0.055);
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.035);
+  }
+
+  /* Mobile bottom nav — same glass treatment as sidebar (horizontal strip) */
+  .mobile-nav-glass {
+    background: rgba(255, 255, 255, 0.94);
+    border-top: 1px solid rgba(203, 213, 225, 0.55);
+  }
+  .dark .mobile-nav-glass {
+    background: linear-gradient(
+      160deg,
+      rgba(5, 21, 63, 0.82) 0%,
+      rgba(7, 37, 97, 0.76) 100%
+    );
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  }
+
+  /* ── Active nav item — glass + neumorphic hybrid ── */
+  .nav-active {
+    background: #4318FF !important;
+    color: white !important;
+    box-shadow:
+      0 4px 14px rgba(67, 24, 255, 0.40),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+  }
+  .dark .nav-active {
+    background: linear-gradient(
+      135deg,
+      rgba(67, 24, 255, 0.30) 0%,
+      rgba(104, 60, 255, 0.20) 100%
+    ) !important;
+    border: 1px solid rgba(67, 24, 255, 0.34) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.10),
+      0 0 20px rgba(67, 24, 255, 0.13),
+      0 4px 12px rgba(0, 0, 0, 0.28) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
+
+  /* Non-active nav hover */
+  .nav-item { transition: all 0.18s ease; }
+  .nav-item:hover:not(.nav-active) {
+    background: rgba(148, 163, 184, 0.09);
+  }
+  .dark .nav-item:hover:not(.nav-active) {
+    background: rgba(255, 255, 255, 0.062);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  /* Logo icon float animation */
+  .logo-icon { animation: float-bob 3.8s ease-in-out infinite; }
+
+  /* ── Buttons ── */
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-4 py-2 bg-brand text-white text-sm font-semibold rounded-xl
-           hover:bg-brand-600 active:scale-95 transition-all duration-150;
+    @apply inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold
+           rounded-xl active:scale-95 transition-all duration-150;
+    background: linear-gradient(135deg, #5c34ff 0%, #4318FF 100%);
+    box-shadow:
+      0 4px 14px rgba(67, 24, 255, 0.38),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+  .btn-primary:hover {
+    box-shadow:
+      0 6px 20px rgba(67, 24, 255, 0.48),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
   }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-150
-           text-slate-600 hover:bg-slate-100 hover:text-slate-900
-           dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white;
+    @apply inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl
+           transition-all duration-150 text-slate-600 dark:text-slate-400;
+  }
+  .btn-ghost:hover {
+    background: rgba(148, 163, 184, 0.10);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    @apply text-slate-900 dark:text-white;
   }
 
+  /* ── Inputs ── */
   .input {
-    @apply w-full border rounded-xl px-4 py-2 text-sm transition-colors duration-150
-           bg-white border-slate-200 text-slate-900 placeholder-slate-400
-           focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/20
-           dark:bg-navy-800 dark:border-white/10 dark:text-white dark:placeholder-slate-500
-           dark:focus:border-brand/60 dark:focus:ring-brand/30;
+    @apply w-full rounded-xl px-4 py-2 text-sm transition-colors duration-150
+           text-slate-900 placeholder-slate-400 focus:outline-none
+           dark:text-white dark:placeholder-slate-500;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--neu-inset);
+  }
+  .input:focus {
+    border-color: rgba(67, 24, 255, 0.45);
+    box-shadow: var(--neu-inset), 0 0 0 3px rgba(67, 24, 255, 0.10);
   }
 
   .select {
-    @apply border rounded-xl px-4 py-2 text-sm transition-colors duration-150 cursor-pointer
-           bg-white border-slate-200 text-slate-900
-           focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/20
-           dark:bg-navy-800 dark:border-white/10 dark:text-white
-           dark:focus:border-brand/60 dark:focus:ring-brand/30;
+    @apply rounded-xl px-4 py-2 text-sm transition-colors duration-150 cursor-pointer
+           text-slate-900 focus:outline-none dark:text-white;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--neu-inset);
+  }
+  .select:focus {
+    border-color: rgba(67, 24, 255, 0.45);
+    box-shadow: var(--neu-inset), 0 0 0 3px rgba(67, 24, 255, 0.10);
   }
 
+  /* ── Badge — slight glass tint ── */
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
+  /* ── Table ── */
   .th {
-    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap cursor-pointer select-none transition-colors
+    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider
+           whitespace-nowrap cursor-pointer select-none transition-colors
            text-slate-500 hover:text-slate-700
            dark:text-slate-500 dark:hover:text-slate-300;
   }
-
   .td {
-    @apply px-4 py-3 text-sm whitespace-nowrap
-           text-slate-700
-           dark:text-slate-300;
+    @apply px-4 py-3 text-sm whitespace-nowrap text-slate-700 dark:text-slate-300;
   }
-
+  /* Transition only — hover background is set below @layer so it wins
+     over zebra inline utility classes (specificity [0,1,1] > [0,1,0]) */
   .tr {
-    @apply border-b transition-colors
-           border-slate-100 hover:bg-slate-50
-           dark:border-white/5 dark:hover:bg-white/[0.02];
+    @apply border-b border-slate-100 dark:border-white/5;
+    transition:
+      background-color 0.15s ease,
+      box-shadow       0.15s ease;
   }
+}
+
+/* ─── Table row hover ────────────────────────────────────────────────────────
+   Written outside @layer so specificity [0,1,1] beats zebra utility [0,1,0].
+
+   Two known limitations of <tr> in CSS table layout:
+     • box-shadow is silently ignored on <tr> — accent is applied to td instead.
+     • Low-opacity tints on white even-rows are near-invisible — bumped to 0.10+.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Light mode — brand violet wash, clearly visible on both white and slate rows */
+.tr:hover {
+  background-color: rgba(67, 24, 255, 0.10);
+}
+/* Left-edge accent on the first cell (box-shadow works on <td>, not <tr>) */
+.tr:hover > td:first-child,
+.tr:hover > .td:first-child {
+  box-shadow: inset 3px 0 0 rgba(67, 24, 255, 0.50);
+}
+
+/* Dark mode — indigo wash clearly above odd-row white/[0.042] */
+.dark .tr:hover {
+  background-color: rgba(134, 140, 255, 0.13);
+}
+.dark .tr:hover > td:first-child,
+.dark .tr:hover > .td:first-child {
+  box-shadow: inset 3px 0 0 rgba(134, 140, 255, 0.60);
 }

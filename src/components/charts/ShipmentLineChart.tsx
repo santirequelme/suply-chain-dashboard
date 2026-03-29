@@ -44,7 +44,7 @@ export default function ShipmentLineChart({ data, title, dataKey: singleKey, lin
     : [{ label: "Revenue", color: colors.primary }, { label: "Shipments", color: colors.success }];
 
   return (
-    <div className="card p-5 flex flex-col gap-4 h-full">
+    <div className="card chart-card p-5 flex flex-col gap-4 h-full">
       {title && (
         <div className="flex items-center justify-between flex-wrap gap-2">
           <p className="font-heading text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
@@ -58,8 +58,8 @@ export default function ShipmentLineChart({ data, title, dataKey: singleKey, lin
           </div>
         </div>
       )}
-      <div className="flex-1 min-h-0" style={{ minHeight: 220 }}>
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="w-full" style={{ height: 240 }}>
+        <ResponsiveContainer width="100%" height={240}>
           <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">

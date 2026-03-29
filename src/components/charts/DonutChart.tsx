@@ -38,7 +38,7 @@ function CustomTooltip({ active, payload, formatter, colors }: {
 export default function DonutChart({ data, title, centerLabel, centerValue, formatter }: DonutChartProps) {
   const colors = useChartColors();
   return (
-    <div className="card p-5 flex flex-col gap-3 h-full">
+    <div className="card chart-card p-5 flex flex-col gap-3 h-full">
       {title && <p className="font-heading text-sm font-semibold text-slate-900 dark:text-white">{title}</p>}
 
       {/* Donut — perfectly centred, no built-in Legend pushing it around */}

@@ -48,8 +48,15 @@ export default {
         "brand-gradient": "linear-gradient(135deg, #868CFF 0%, #4318FF 100%)",
       },
       boxShadow: {
-        card: "0 4px 24px 0 rgba(0,0,0,0.4)",
-        "brand-glow": "0 0 20px rgba(67,24,255,0.3)",
+        card:          "0 4px 24px 0 rgba(0,0,0,0.4)",
+        "brand-glow":  "0 0 20px rgba(67,24,255,0.3)",
+        "neu-light":   "5px 8px 20px rgba(148,163,184,0.38), -3px -4px 12px rgba(255,255,255,0.92)",
+        "neu-dark":    "4px 6px 18px rgba(0,0,0,0.58), -2px -2px 8px rgba(255,255,255,0.04)",
+        "neu-hover-l": "8px 14px 30px rgba(148,163,184,0.48), -4px -5px 16px rgba(255,255,255,0.98)",
+        "neu-hover-d": "6px 12px 30px rgba(0,0,0,0.70), -3px -3px 12px rgba(255,255,255,0.055)",
+        "glass":       "0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.18)",
+        "kpi-brand":   "0 6px 24px rgba(67,24,255,0.22), inset 0 1px 0 rgba(255,255,255,0.14)",
+        "kpi-success": "0 6px 24px rgba(1,181,116,0.18), inset 0 1px 0 rgba(255,255,255,0.14)",
       },
       borderColor: {
         DEFAULT: "rgba(255,255,255,0.08)",

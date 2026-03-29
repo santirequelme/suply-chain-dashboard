@@ -1,6 +1,6 @@
 # Make2Flow — Supply Chain Analytics Dashboard
 
-A production-quality supply chain analytics dashboard built with React 18, TypeScript, Tailwind CSS, and Recharts. Features a Vision UI-inspired theme with a built-in dark/light mode toggle, fully responsive layout, and rich data exploration across facilities, suppliers, products, and shipments.
+A production-quality, mobile-first supply chain analytics dashboard built with React, TypeScript, Tailwind CSS, and Recharts. The latest UX/UI improvements focus on clearer navigation, stronger visual hierarchy, smarter filtering, and deeper route intelligence for operational decision-making.
 
 ## Pencil design file: m2f-suply-chain-design.pen
 
@@ -27,6 +27,83 @@ Open [http://localhost:5173](http://localhost:5173)
 
 ---
 
+## UX/UI Improvements
+
+### Information Architecture and Navigation
+
+Navigation was restructured to follow a clearer and more logical flow:
+
+- Dashboard
+- Suppliers
+- Facilities
+- Products
+- Shipments
+- Settings
+
+This sequence improves consistency, discoverability, and data hierarchy across the full analytics journey.
+
+### Dashboard Visual System
+
+The Dashboard was upgraded to include all required visual building blocks in one cohesive overview:
+
+- KPI cards with trend indicators
+- Line chart for time-based analysis
+- Bar chart for cross-entity comparison
+- Donut chart for distribution analysis
+- Paginated data table for recent activity
+
+The result is a faster read of business performance with clearer, more actionable insights.
+
+### Purpose-Driven Views
+
+Each section was refined with a specific analytical goal:
+
+- **Suppliers**: tier analysis, activity trends, and detailed tables
+- **Facilities**: type distribution, regional breakdown, and linked supplier context
+- **Products**: volume trends and full relational visibility
+- **Shipments**: the most robust page, with advanced filtering, time analysis, and detailed operational tables
+
+### Global Filtering Experience
+
+A consistent global filtering system now powers key views with:
+
+- Date range
+- Suppliers
+- Facilities
+- Products
+- Status
+
+Filters update instantly, display as removable chips, and use mobile-friendly bottom sheets for small screens.
+
+### Time Intelligence (2020-2026)
+
+Time-based analysis was integrated across core pages to support trend tracking from 2020 to 2026 and improve temporal comparison in daily decision-making.
+
+### Data Table Upgrades
+
+All key tables were improved with:
+
+- Sorting
+- Pagination
+- Expandable rows
+- Responsive mobile behavior
+
+This creates a more reliable data exploration experience across devices.
+
+### Settings with Operational Value
+
+The Settings page now provides practical controls that directly affect analytics workflows:
+
+- Data preferences
+- Time granularity
+- Default filter presets
+
+### Route Intelligence Map
+
+As a standout feature, the Shipments view now includes a Route Intelligence Map that visualizes facility-to-facility flows with interactive routes. This improves understanding of logistics movement, route concentration, and potential bottlenecks.
+
+---
+
 ## Mobile-First Approach
 
 The entire application was designed mobile-first, meaning every layout decision starts from the smallest screen and scales up. The sidebar collapses into a slide-over drawer on mobile, revealed by a hamburger menu in the topbar. Navigation switches from a persistent left rail on desktop to a full-height overlay on mobile, ensuring thumb-friendly tap targets and no content overlap.
@@ -39,7 +116,7 @@ Every interactive element (buttons, selects, table rows) meets the 44px minimum 
 
 ## AI Workflow
 
-This project was built in collaboration with Claude (Anthropic) running in Cowork mode. The workflow followed a design-then-code discipline: wireframes for all five views were created first in Pencil.dev, then a custom Python script was used to apply a Vision UI dark color palette directly to the `.pen` JSON file — avoiding any manual color-picking. Once the design was locked, Claude scaffolded the full React project from `package.json` through every component and view, following three skills loaded at the start of the session: `react-19` (no manual memoization, named imports), `typescript` (const-types pattern, flat interfaces, no `any`), and `tailwind-4` (`cn()` utility, semantic classes, no hex in `className`).
+This project was built in collaboration with Claude (Anthropic) running in Cowork mode. The workflow followed a design-then-code discipline: wireframes for all core views were created first in Pencil.dev, then a custom Python script was used to apply a Vision UI dark color palette directly to the `.pen` JSON file — avoiding any manual color-picking. Once the design was locked, Claude scaffolded the full React project from `package.json` through every component and view, following three skills loaded at the start of the session: `react-19` (no manual memoization, named imports), `typescript` (const-types pattern, flat interfaces, no `any`), and `tailwind-4` (`cn()` utility, semantic classes, no hex in `className`).
 
 Mock data (55 facilities, 22 suppliers, 120 products, 220 shipments) was generated using a seeded pseudo-random number generator so the data is deterministic, realistic, and reproducible without a database. The AI helped identify the right seeding strategy to avoid repeating patterns and to produce plausible seasonal revenue curves across 2020–2026.
 
@@ -51,9 +128,10 @@ Mock data (55 facilities, 22 suppliers, 120 products, 220 shipments) was generat
 - **Facilities** — Full data table (55 rows) with sort, pagination, CSV export, and filters by type, status, and region. Utilization progress bars per row.
 - **Suppliers** — Star ratings, on-time delivery trend badges, defect rate color coding, aggregate summary chips
 - **Products** — Stock status color coding, lead time indicators, category donut chart, 120 products
-- **Shipments** — Multi-filter (status, carrier, year), value + quantity columns, trend chart, 220 records
+- **Shipments** — Advanced filtering, time analysis, detailed tables, and interactive Route Intelligence Map
+- **Settings** — Data preferences, time granularity, and default filters
 - **Dark/Light mode toggle** — Persisted via Zustand + localStorage
-- **Global search** — Topbar search feeds into the active table's search filter
+- **Global filters** — Cross-view filtering with instant updates, chips, and mobile bottom sheets
 - **CSV Export** — Available on every data table
 - **Accessibility** — ARIA labels on all tables, navigation, form controls, and status badges
 
@@ -65,11 +143,12 @@ Mock data (55 facilities, 22 suppliers, 120 products, 220 shipments) was generat
 src/
 ├── components/
 │   ├── charts/       # RevenueBarChart, ShipmentLineChart, DonutChart
+│   ├── map/          # Route Intelligence Map components
 │   ├── layout/       # AppLayout, Sidebar, Topbar
 │   └── ui/           # KpiCard, DataTable, Badge
 ├── data/             # Mock data + derived helpers
 ├── lib/              # cn(), formatters, CSV export
 ├── store/            # Zustand app store
 ├── types/            # TypeScript interfaces (const-types pattern)
-└── views/            # Dashboard, Facilities, Suppliers, Products, Shipments
+└── views/            # Dashboard, Suppliers, Facilities, Products, Shipments, Settings
 ```
