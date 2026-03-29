@@ -138,6 +138,8 @@ const SUPPLIER_NAMES = [
   "SunriseMachinery Co",
 ];
 
+const TIERS = ["Tier 1", "Tier 1", "Tier 2", "Tier 2", "Tier 2", "Tier 3"] as const;
+
 export const suppliers: Supplier[] = SUPPLIER_NAMES.map((name, i) => {
   const rng = seededRng(i * 1337 + 42);
   const countryKey = COUNTRIES_LIST[i % COUNTRIES_LIST.length];
@@ -148,6 +150,7 @@ export const suppliers: Supplier[] = SUPPLIER_NAMES.map((name, i) => {
     country: countryKey,
     region: countryData.region,
     category: SUPPLIER_CATEGORIES[i % SUPPLIER_CATEGORIES.length],
+    tier: TIERS[i % TIERS.length],
     status:
       i < 17
         ? "active"
@@ -376,3 +379,77 @@ export function getShipmentTrend() {
     .slice(-13);
   return last12;
 }
+
+export function getSuppliersByTier() {
+  const map: Record<string, number> = {};
+  suppliers.forEach((s) => { map[s.tier] = (map[s.tier] ?? 0) + 1; });
+  return ["Tier 1", "Tier 2", "Tier 3"].map((t) => ({ name: t, value: map[t] ?? 0 }));
+}
+
+export function getFacilitiesByType() {
+  const map: Record<string, number> = {};
+  facilities.forEach((f) => { map[f.type] = (map[f.type] ?? 0) + 1; });
+  return Object.entries(map).map(([name, value]) => ({ name, value }));
+}
+
+export function getFacilitiesByRegion() {
+  const map: Record<string, number> = {};
+  facilities.forEach((f) => { map[f.location.region] = (map[f.location.region] ?? 0) + 1; });
+  return Object.entries(map)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+}
+
+export function getProductVolumeTrend() {
+  // Aggregate shipment quantities by month/year
+  const map: Record<string, number> = {};
+  shipments.forEach((s) => {
+    const d = new Date(s.shippedAt);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    map[key] = (map[key] ?? 0) + s.quantity;
+  });
+  return Object.entries(map)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, volume]) => {
+      const [year, month] = key.split("-");
+      const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      return { label: `${MONTHS[parseInt(month) - 1]} '${year.slice(2)}`, volume, key };
+    });
+}
+
+export function getShipmentsFilteredByDate(start: string, end: string) {
+  const s = new Date(start).getTime();
+  const e = new Date(end).getTime();
+  return shipments.filter((sh) => {
+    const t = new Date(sh.shippedAt).getTime();
+    return t >= s && t <= e;
+  });
+}
+
+export function getMonthlyRevenueFiltered(start: string, end: string) {
+  const sy = new Date(start).getFullYear();
+  const ey = new Date(end).getFullYear();
+  return monthlyRevenue.filter((m) => m.year >= sy && m.year <= ey);
+}
+
+// All unique regions across facilities and suppliers
+export const ALL_REGIONS = Array.from(
+  new Set([
+    ...facilities.map((f) => f.location.region),
+    ...suppliers.map((s) => s.region),
+  ])
+).sort();
+
+export const ALL_CATEGORIES = Array.from(new Set(products.map((p) => p.category))).sort();
+export const ALL_STATUSES   = Array.from(new Set(shipments.map((s) => s.status))).sort();
+
+// ─── Carbon per cycle phase (kg CO₂e %) ──────────────────────────────────────
+// Industry-representative breakdown of supply chain carbon footprint by phase.
+export const CARBON_BY_PHASE = [
+  { name: "Manufacturing",    value: 38 },
+  { name: "Transportation",   value: 27 },
+  { name: "Raw Materials",    value: 17 },
+  { name: "Warehousing",      value: 9  },
+  { name: "Last-Mile",        value: 6  },
+  { name: "Returns",          value: 3  },
+];

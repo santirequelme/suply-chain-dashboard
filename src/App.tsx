@@ -7,6 +7,8 @@ import Facilities from "@/views/Facilities";
 import Suppliers from "@/views/Suppliers";
 import Products from "@/views/Products";
 import Shipments from "@/views/Shipments";
+import SettingsView from "@/views/Settings";
+import AccountView from "@/views/Account";
 
 export default function App() {
   const darkMode = useAppStore((s) => s.darkMode);
@@ -29,6 +31,8 @@ export default function App() {
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/products" element={<Products />} />
           <Route path="/shipments" element={<Shipments />} />
+          <Route path="/settings" element={<SettingsView />} />
+          <Route path="/account" element={<AccountView />} />
         </Route>
       </Routes>
     </BrowserRouter>

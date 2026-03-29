@@ -8,26 +8,32 @@ interface DataPoint { name: string; revenue: number; }
 interface RevenueBarChartProps {
   data: DataPoint[];
   title?: string;
+  isCurrency?: boolean;
+  valueLabel?: string;
 }
 
-function CustomTooltip({ active, payload, label, colors }: {
+function CustomTooltip({ active, payload, label, colors, isCurrency, valueLabel }: {
   active?: boolean;
   payload?: Array<{ value: number }>;
   label?: string;
   colors: ReturnType<typeof useChartColors>;
+  isCurrency?: boolean;
+  valueLabel?: string;
 }) {
   if (!active || !payload?.length) return null;
+  const val = payload[0].value;
+  const display = isCurrency !== false
+    ? `$${(val / 1_000_000).toFixed(2)}M`
+    : `${val}${valueLabel ? ` ${valueLabel}` : ""}`;
   return (
     <div style={{ background: colors.tooltipBg, border: `1px solid ${colors.tooltipBorder}`, borderRadius: 12, padding: "10px 14px" }}>
       <p style={{ color: colors.tooltipSub, fontSize: 12, marginBottom: 4 }}>{label}</p>
-      <p style={{ color: colors.tooltipText, fontWeight: 700, fontSize: 14 }}>
-        ${(payload[0].value / 1_000_000).toFixed(2)}M
-      </p>
+      <p style={{ color: colors.tooltipText, fontWeight: 700, fontSize: 14 }}>{display}</p>
     </div>
   );
 }
 
-export default function RevenueBarChart({ data, title }: RevenueBarChartProps) {
+export default function RevenueBarChart({ data, title, isCurrency = true, valueLabel }: RevenueBarChartProps) {
   const colors = useChartColors();
   return (
     <div className="card p-5 flex flex-col gap-4 h-full">
@@ -45,9 +51,12 @@ export default function RevenueBarChart({ data, title }: RevenueBarChartProps) {
             <XAxis dataKey="name" tick={{ fill: colors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
             <YAxis
               tick={{ fill: colors.text, fontSize: 11 }} axisLine={false} tickLine={false}
-              tickFormatter={(v: number) => `$${(v / 1_000_000).toFixed(0)}M`} width={48}
+              tickFormatter={(v: number) =>
+                isCurrency !== false ? `$${(v / 1_000_000).toFixed(0)}M` : String(v)
+              }
+              width={48}
             />
-            <Tooltip content={<CustomTooltip colors={colors} />} cursor={{ fill: colors.gridLine }} />
+            <Tooltip content={<CustomTooltip colors={colors} isCurrency={isCurrency} valueLabel={valueLabel} />} cursor={{ fill: colors.gridLine }} />
             <Bar dataKey="revenue" fill="url(#barGrad)" radius={[6, 6, 0, 0]} maxBarSize={40} />
           </BarChart>
         </ResponsiveContainer>

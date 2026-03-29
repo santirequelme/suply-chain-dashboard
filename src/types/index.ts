@@ -22,6 +22,13 @@ export const SUPPLIER_STATUS = {
 } as const;
 export type SupplierStatus = (typeof SUPPLIER_STATUS)[keyof typeof SUPPLIER_STATUS];
 
+export const SUPPLIER_TIER = {
+  TIER_1: "Tier 1",
+  TIER_2: "Tier 2",
+  TIER_3: "Tier 3",
+} as const;
+export type SupplierTier = (typeof SUPPLIER_TIER)[keyof typeof SUPPLIER_TIER];
+
 export const PRODUCT_STATUS = {
   IN_STOCK: "in_stock",
   LOW_STOCK: "low_stock",
@@ -75,6 +82,7 @@ export interface Supplier {
   country: string;
   region: string;
   category: string;
+  tier: SupplierTier;
   status: SupplierStatus;
   rating: number;
   onTimeDelivery: number;

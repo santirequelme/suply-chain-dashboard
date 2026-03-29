@@ -8,6 +8,10 @@ interface DataPoint { month: string; year: number; shipments: number; revenue: n
 interface ShipmentLineChartProps {
   data: DataPoint[];
   title?: string;
+  /** When set, shows only one series with this key */
+  dataKey?: "revenue" | "shipments";
+  /** Label for the single series in legend */
+  lineLabel?: string;
 }
 
 function CustomTooltip({ active, payload, label, colors }: {
@@ -30,20 +34,22 @@ function CustomTooltip({ active, payload, label, colors }: {
   );
 }
 
-export default function ShipmentLineChart({ data, title }: ShipmentLineChartProps) {
+export default function ShipmentLineChart({ data, title, dataKey: singleKey, lineLabel }: ShipmentLineChartProps) {
   const colors = useChartColors();
   const chartData = data.map((d) => ({ ...d, label: `${d.month} '${String(d.year).slice(2)}` }));
+  const isSingle = !!singleKey;
+
+  const legend = isSingle
+    ? [{ label: lineLabel ?? singleKey!, color: colors.primary }]
+    : [{ label: "Revenue", color: colors.primary }, { label: "Shipments", color: colors.success }];
 
   return (
     <div className="card p-5 flex flex-col gap-4 h-full">
       {title && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <p className="font-heading text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
           <div className="flex items-center gap-4">
-            {[
-              { label: "Revenue", color: colors.primary },
-              { label: "Shipments", color: colors.success },
-            ].map(({ label, color }) => (
+            {legend.map(({ label, color }) => (
               <span key={label} className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                 <span className="inline-block h-2 w-2 rounded-full" style={{ background: color }} />
                 {label}
@@ -67,11 +73,23 @@ export default function ShipmentLineChart({ data, title }: ShipmentLineChartProp
             </defs>
             <CartesianGrid stroke={colors.gridLine} strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="label" tick={{ fill: colors.text, fontSize: 10 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-            <YAxis yAxisId="revenue" orientation="left" tick={{ fill: colors.text, fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `$${(v / 1_000_000).toFixed(0)}M`} width={44} />
-            <YAxis yAxisId="shipments" orientation="right" tick={{ fill: colors.text, fontSize: 10 }} axisLine={false} tickLine={false} width={36} />
+            {isSingle ? (
+              <YAxis tick={{ fill: colors.text, fontSize: 10 }} axisLine={false} tickLine={false} width={44} />
+            ) : (
+              <>
+                <YAxis yAxisId="revenue" orientation="left" tick={{ fill: colors.text, fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `$${(v / 1_000_000).toFixed(0)}M`} width={44} />
+                <YAxis yAxisId="shipments" orientation="right" tick={{ fill: colors.text, fontSize: 10 }} axisLine={false} tickLine={false} width={36} />
+              </>
+            )}
             <Tooltip content={<CustomTooltip colors={colors} />} />
-            <Area yAxisId="revenue" type="monotone" dataKey="revenue" stroke={colors.primary} strokeWidth={2} fill="url(#revenueGrad)" dot={false} activeDot={{ r: 4, fill: colors.primary }} />
-            <Area yAxisId="shipments" type="monotone" dataKey="shipments" stroke={colors.success} strokeWidth={2} fill="url(#shipGrad)" dot={false} activeDot={{ r: 4, fill: colors.success }} />
+            {isSingle ? (
+              <Area type="monotone" dataKey={singleKey!} stroke={colors.primary} strokeWidth={2} fill="url(#revenueGrad)" dot={false} activeDot={{ r: 4, fill: colors.primary }} />
+            ) : (
+              <>
+                <Area yAxisId="revenue" type="monotone" dataKey="revenue" stroke={colors.primary} strokeWidth={2} fill="url(#revenueGrad)" dot={false} activeDot={{ r: 4, fill: colors.primary }} />
+                <Area yAxisId="shipments" type="monotone" dataKey="shipments" stroke={colors.success} strokeWidth={2} fill="url(#shipGrad)" dot={false} activeDot={{ r: 4, fill: colors.success }} />
+              </>
+            )}
           </AreaChart>
         </ResponsiveContainer>
       </div>
