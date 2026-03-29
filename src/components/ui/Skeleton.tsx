@@ -40,13 +40,9 @@ export function SkeletonKpiCard({ className }: SkeletonProps) {
 
 export function SkeletonChart({ className }: SkeletonProps) {
   return (
-    <div className={cn("card p-5 flex flex-col gap-4", className)}>
+    <div className={cn("card p-5 flex flex-col gap-3", className)}>
       <Skeleton className="h-4 w-40" />
-      <div className="flex-1 min-h-[200px] flex items-center justify-center">
-        <div className="w-full h-full flex items-center justify-center">
-          <Skeleton className="h-full w-full" />
-        </div>
-      </div>
+      <Skeleton className="flex-1 min-h-[200px] w-full rounded-lg" />
     </div>
   );
 }

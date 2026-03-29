@@ -26,9 +26,9 @@ export default function MobileBottomNav() {
                 to={path}
                 className={({ isActive }) =>
                   cn(
-                    "nav-item flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 transition-all duration-200",
+                    "nav-item flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2",
                     isActive
-                      ? "nav-active scale-105 -translate-y-1 shadow-lg shadow-brand/25"
+                      ? "nav-active scale-105 -translate-y-1"
                       : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                   )
                 }
@@ -40,7 +40,7 @@ export default function MobileBottomNav() {
                       <Icon
                         className={cn(
                           "h-5 w-5",
-                          isActive ? "text-brand dark:text-white" : "text-slate-500 dark:text-slate-400"
+                          isActive ? "text-white" : "text-slate-500 dark:text-slate-400"
                         )}
                         aria-hidden="true"
                       />
@@ -48,7 +48,7 @@ export default function MobileBottomNav() {
                     <span
                       className={cn(
                         "text-[10px] font-medium leading-none",
-                        isActive ? "text-brand dark:text-white" : "text-slate-400 dark:text-slate-500"
+                        isActive ? "text-white" : "text-slate-400 dark:text-slate-500"
                       )}
                     >
                       {label}

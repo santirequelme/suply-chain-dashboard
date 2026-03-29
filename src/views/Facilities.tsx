@@ -12,7 +12,7 @@ import MobileFilterSheet from "@/components/filters/MobileFilterSheet";
 import DonutChart from "@/components/charts/DonutChart";
 import RevenueBarChart from "@/components/charts/RevenueBarChart";
 import {
-  SkeletonCard,
+  Skeleton,
   SkeletonChart,
   SkeletonTable,
   LoadingSpinner,
@@ -230,9 +230,9 @@ export default function Facilities() {
         {kpiLoading.isLoading ? (
           <>
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="card px-4 py-3 text-center">
-                <SkeletonCard className="h-7 w-20 mx-auto" />
-                <SkeletonCard className="h-3 w-24 mx-auto mt-2" />
+              <div key={i} className="card px-4 py-3 text-center flex flex-col items-center gap-2">
+                <Skeleton className="h-7 w-20" />
+                <Skeleton className="h-3 w-24" />
               </div>
             ))}
           </>

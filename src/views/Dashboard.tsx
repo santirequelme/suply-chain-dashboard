@@ -18,6 +18,7 @@ import {
   SkeletonCard,
   SkeletonChart,
   SkeletonTable,
+  Skeleton,
   LoadingSpinner,
 } from "@/components/ui/LoadingContent";
 import { formatCurrency, formatPercent, formatDate, cn } from "@/lib/utils";
@@ -221,16 +222,16 @@ export default function Dashboard() {
         {kpiLoading.isLoading ? (
           <>
             <div className="card px-4 py-3 flex items-center justify-between">
-              <SkeletonCard className="h-3 w-16" />
-              <SkeletonCard className="h-6 w-8" />
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-6 w-8" />
             </div>
             <div className="card px-4 py-3 flex items-center justify-between">
-              <SkeletonCard className="h-3 w-16" />
-              <SkeletonCard className="h-6 w-8" />
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-6 w-8" />
             </div>
             <div className="card px-4 py-3 flex items-center justify-between">
-              <SkeletonCard className="h-3 w-16" />
-              <SkeletonCard className="h-6 w-8" />
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-6 w-8" />
             </div>
           </>
         ) : (

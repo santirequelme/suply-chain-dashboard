@@ -82,6 +82,14 @@
   50%       { transform: translateY(-2px); }
 }
 
+/* Mobile nav tap — quick squeeze + bounce back */
+@keyframes nav-tap {
+  0%   { transform: scale(1);    }
+  40%  { transform: scale(0.88); }
+  70%  { transform: scale(1.06); }
+  100% { transform: scale(1);    }
+}
+
 /* ─── Base layer ─────────────────────────────────────────────────────────── */
 @layer base {
   .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -244,7 +252,7 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
   }
 
-  /* ── Active nav item — glass + neumorphic hybrid ── */
+  /* ── Active nav item — glass + neumorphic hybrid (desktop sidebar) ── */
   .nav-active {
     background: linear-gradient(
       135deg,
@@ -276,8 +284,48 @@
     -webkit-backdrop-filter: blur(10px) !important;
   }
 
-  /* Non-active nav hover */
-  .nav-item { transition: all 0.18s ease; }
+  /* ── Active nav item — solid opaque pill (mobile bottom nav only) ── */
+  .mobile-nav-glass .nav-active {
+    /* Solid gradient — no transparency so it never bleeds through the bar */
+    background: linear-gradient(
+      135deg,
+      #5535f5 0%,
+      #4318FF 100%
+    ) !important;
+    border: 1px solid rgba(67, 24, 255, 0.55) !important;
+    color: #ffffff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      0 4px 18px rgba(67, 24, 255, 0.42),
+      0 2px 8px  rgba(67, 24, 255, 0.28) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .dark .mobile-nav-glass .nav-active {
+    background: linear-gradient(
+      135deg,
+      #5c3eff 0%,
+      #3d15f0 100%
+    ) !important;
+    border: 1px solid rgba(108, 72, 255, 0.50) !important;
+    color: white !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 0  22px rgba(67, 24, 255, 0.30),
+      0 4px 14px rgba(0,   0,   0,   0.36) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Non-active nav hover + press micro-interaction */
+  .nav-item {
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-item:active {
+    animation: nav-tap 0.28s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    transform-origin: center bottom;
+  }
   .nav-item:hover:not(.nav-active) {
     background: rgba(67, 24, 255, 0.08);
   }
