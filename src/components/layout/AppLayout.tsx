@@ -5,7 +5,7 @@ import MobileBottomNav from "./MobileBottomNav";
 
 export default function AppLayout() {
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-navy-900">
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-navy-900" style={{ backgroundImage: "inherit" }}>
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         <Topbar />

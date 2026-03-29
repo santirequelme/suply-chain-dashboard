@@ -25,7 +25,11 @@ export default function KpiCard({
   const isPositive = trend >= 0;
 
   return (
-    <article className={cn("card p-5 flex flex-col gap-4", className)} aria-label={`${label}: ${value}`}>
+    <article
+      className={cn("card kpi-card p-5 flex flex-col gap-4", className)}
+      data-color={color}
+      aria-label={`${label}: ${value}`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{label}</p>

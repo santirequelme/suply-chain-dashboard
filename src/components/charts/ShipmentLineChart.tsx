@@ -44,7 +44,7 @@ export default function ShipmentLineChart({ data, title, dataKey: singleKey, lin
     : [{ label: "Revenue", color: colors.primary }, { label: "Shipments", color: colors.success }];
 
   return (
-    <div className="card p-5 flex flex-col gap-4 h-full">
+    <div className="card chart-card p-5 flex flex-col gap-4 h-full">
       {title && (
         <div className="flex items-center justify-between flex-wrap gap-2">
           <p className="font-heading text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
