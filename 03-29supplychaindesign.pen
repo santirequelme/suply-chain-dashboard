@@ -73035,11 +73035,11 @@
     {
       "type": "frame",
       "id": "yDudY",
-      "x": -1241,
-      "y": 1976,
+      "x": -2910,
+      "y": -555,
       "name": "Design System",
-      "width": 1800,
-      "height": 2800,
+      "width": 1855,
+      "height": 10456,
       "fill": "#0a0f2eff",
       "layout": "vertical",
       "children": [
@@ -73094,8 +73094,7 @@
       "type": "frame",
       "id": "gjp8n",
       "x": -2910,
-      "y": -145,
-      "name": "Design System",
+      "y": -455,
       "width": 960,
       "layout": "vertical",
       "gap": 32,
@@ -73406,7 +73405,8 @@
                   "fill": "#ffffffff",
                   "content": "14px Regular",
                   "fontFamily": "Inter",
-                  "fontSize": 14
+                  "fontSize": 14,
+                  "fontWeight": "normal"
                 },
                 {
                   "type": "text",
@@ -73415,7 +73415,8 @@
                   "fill": "#ffffffff",
                   "content": "12px Regular",
                   "fontFamily": "Inter",
-                  "fontSize": 12
+                  "fontSize": 12,
+                  "fontWeight": "normal"
                 },
                 {
                   "type": "text",
@@ -73424,7 +73425,8 @@
                   "fill": "#94a3b8ff",
                   "content": "10px Regular",
                   "fontFamily": "Inter",
-                  "fontSize": 10
+                  "fontSize": 10,
+                  "fontWeight": "normal"
                 }
               ]
             }

@@ -1,6 +1,6 @@
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
-import { Sun, Moon, Package, Calendar, MapPin, Settings2, Database, Clock } from "lucide-react";
+import { Sun, Moon, Package, Calendar, MapPin, Settings2, Database, Clock, Palette } from "lucide-react";
 
 const SECTION_CLASS = "card p-5 space-y-5";
 const LABEL_CLASS = "text-sm font-medium text-slate-700 dark:text-slate-300";
@@ -255,6 +255,35 @@ export default function SettingsView() {
             </p>
           </div>
         </div>
+      </section>
+
+      {/* ── Design System ─────────────────────────────────────────── */}
+      <section className={SECTION_CLASS} aria-labelledby="design-system-heading">
+        <SectionHeader
+          icon={Palette}
+          title="Design System"
+          description="Component library and style guide"
+        />
+
+        <a
+          href="/design-system"
+          className="flex items-center justify-between p-3 -mx-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 group-hover:bg-brand/10 transition-colors">
+              <Palette className="h-4.5 w-4.5 text-slate-500 dark:text-slate-400 group-hover:text-brand transition-colors" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white">View Design System</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">Colors, typography, components, and more</p>
+            </div>
+          </div>
+          <span className="text-brand opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+        </a>
       </section>
     </div>
   );

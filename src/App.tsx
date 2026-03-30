@@ -9,6 +9,7 @@ import Products from "@/views/Products";
 import Shipments from "@/views/Shipments";
 import SettingsView from "@/views/Settings";
 import AccountView from "@/views/Account";
+import DesignSystem from "@/views/DesignSystem";
 
 export default function App() {
   const darkMode = useAppStore((s) => s.darkMode);
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/shipments" element={<Shipments />} />
           <Route path="/settings" element={<SettingsView />} />
           <Route path="/account" element={<AccountView />} />
+          <Route path="/design-system" element={<DesignSystem />} />
         </Route>
       </Routes>
     </BrowserRouter>

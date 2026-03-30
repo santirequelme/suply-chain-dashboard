@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Sun, Moon, Bell, User, LogOut, Settings, X } from "lucide-react";
+import { Search, Sun, Moon, Bell, User, LogOut, Settings, X, Palette } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/shipments": { title: "Shipments",  subtitle: "Track all shipment activity" },
   "/settings":  { title: "Settings",   subtitle: "Dashboard preferences" },
   "/account":   { title: "Account",    subtitle: "Profile & account settings" },
+  "/design-system": { title: "Design System", subtitle: "Component library & style guide" },
 };
 
 export default function Topbar() {
@@ -234,6 +235,20 @@ export default function Topbar() {
           >
             <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand" aria-hidden="true" />
+          </button>
+
+          {/* Design System - Mobile (icon only) */}
+          <button
+            className={cn(
+              "lg:hidden p-2 rounded-xl transition-colors",
+              location.pathname === "/design-system"
+                ? "bg-brand text-white shadow-brand-glow"
+                : "text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/10"
+            )}
+            aria-label="Design System"
+            onClick={() => navigate("/design-system")}
+          >
+            <Palette className="h-5 w-5" aria-hidden="true" />
           </button>
 
           {/* Dark / Light toggle — desktop only; on mobile use Settings → Appearance */}
