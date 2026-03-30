@@ -26,3 +26,20 @@ The following "skills" (predefined rules and conventions for AI code generation)
 *   **Recharts:** The chosen library for analytical data visualization; includes interactive and container-adaptable components (`ResponsiveContainer`) such as area, bar, and donut charts.
 *   **React Router v6:** Client-side router used to structure the 6 core views (Dashboard, Suppliers, Facilities, Products, Shipments, Settings), enabling fluid navigation without full page reloads.
 *   **Lucide React:** Used exhaustively for all the modern and clean icons presented in the status bars, menus, and application widgets.
+
+## AI Planning and Results Context
+
+The AI implementation strategy (Cowork mode) and the resulting outcomes were structured to ensure the quality and scalability of the final product:
+
+### 1. Planning Phase
+*   **Design-then-Code Discipline:** The workflow started with wireframing all core views in Pencil.dev before writing any code, ensuring a locked visual scope.
+*   **Automated Theming:** A custom Python script was used to apply a dark color palette (Vision UI inspired) directly to the design's `.pen` JSON file.
+*   **Skill Enforcement:** Specific guidelines ("skills") were loaded from the start of the session: **React 19** (no manual memoization, named imports), **TypeScript** (const-types pattern, no `any`), and **Tailwind 4** (exhaustive use of the `cn()` utility).
+*   **Deterministic Data Strategy:** Instead of relying on a real backend, the AI helped plan a synthetic data strategy using a seeded pseudo-random number generator. This results in realistic and reproducible data (congruent seasonal curves for 2020-2026, 55 facilities, 120 products).
+
+### 2. Execution & Results Context
+*   **Full Scaffolding:** Starting from the validated design, the AI scaffolded the entire React project from `package.json`, modeling full views and implementing component logic.
+*   **High-Fidelity Visualizations:** Conceptual static graphics were replaced with a precise geographic projection using `react-simple-maps`, achieving interactive route intelligence with animated trails and pulses to denote active facilities.
+*   **Progressive Loading & UX Validation:** A progressive loading experience ("Skeleton loaders") was implemented to prevent Cumulative Layout Shift (visual jumps), providing a professional, desktop-like behavior.
+*   **Mobile-First Realization:** The mobile-first planning was successfully reflected by adapting an anchored bottom navigation bar (eliminating the hamburger menu) and responsive data tables that avoid truncating information on narrow screens via expandable rows.
+*   **Robust Feature Completion:** Complex systemic features were consolidated, including global unit and time configuration in *Settings*, native CSV file export on all tables, and a cross-sectional filtering panel (with mobile bottom sheets) managed by `Zustand`.
