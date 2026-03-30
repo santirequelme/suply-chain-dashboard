@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   getDashboardStats, getRevenueByCategory,
   getTopFacilitiesByRevenue, getMonthlyRevenueFiltered, getShipmentsFilteredByDate,
@@ -118,7 +119,17 @@ export default function Dashboard() {
 
   const kpis = [
     {
+      label: "Revenue",
+      value: formatCurrency(filteredRevTotal, true),
+      subValue: formatPercent(stats.onTimeRate) + " on-time",
+      trend: 12.4,
+      trendLabel: "vs prior period",
+      icon: "💰",
+      color: "brand" as const,
+    },
+    {
       label: "Total Shipments",
+      to: "/shipments",
       value: String(filteredShipments.length),
       subValue: `${filteredShipments.filter((s) => s.status === "delivered").length} delivered`,
       trend: 8.3,
@@ -128,6 +139,7 @@ export default function Dashboard() {
     },
     {
       label: "Active Facilities",
+      to: "/facilities",
       value: String(stats.activeFacilities),
       subValue: `of ${55} total`,
       trend: 3.1,
@@ -137,21 +149,13 @@ export default function Dashboard() {
     },
     {
       label: "Active Suppliers",
+      to: "/suppliers",
       value: String(stats.activeSuppliers),
       subValue: `${22 - stats.activeSuppliers} on hold`,
       trend: 4.2,
       trendLabel: "vs last quarter",
       icon: "🏭",
       color: "success" as const,
-    },
-    {
-      label: "Revenue",
-      value: formatCurrency(filteredRevTotal, true),
-      subValue: formatPercent(stats.onTimeRate) + " on-time",
-      trend: 12.4,
-      trendLabel: "vs prior period",
-      icon: "💰",
-      color: "brand" as const,
     },
   ];
 
@@ -212,7 +216,15 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-            {kpis.map((kpi) => <KpiCard key={kpi.label} {...kpi} />)}
+            {kpis.map((kpi) => (
+              kpi.to ? (
+                <Link key={kpi.label} to={kpi.to} className="block cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-brand rounded-2xl">
+                  <KpiCard {...kpi} className="cursor-pointer h-full" />
+                </Link>
+              ) : (
+                <KpiCard key={kpi.label} {...kpi} className="h-full" />
+              )
+            ))}
           </div>
         )}
       </section>
