@@ -29,10 +29,13 @@ export default function AppLayout() {
         {!isDesignSystem && (
           <Link
             to="/design-system"
-            className="hidden lg:flex fixed bottom-6 right-6 z-40 items-center gap-2 px-4 py-2.5 rounded-xl btn-primary shadow-lg hover:shadow-xl transition-shadow"
+            className="hidden lg:flex fixed bottom-6 right-6 z-40 p-2.5 rounded-xl btn-primary shadow-lg hover:shadow-xl transition-shadow group"
+            aria-label="Go to Design System"
           >
-            <Palette className="w-4 h-4" />
-            <span>Go to Design System</span>
+            <Palette className="w-5 h-5" />
+            <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 dark:bg-navy-800 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+              Access Design System
+            </span>
           </Link>
         )}
       </div>
