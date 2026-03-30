@@ -22,8 +22,8 @@ import {
   Skeleton,
   LoadingSpinner,
 } from "@/components/ui/LoadingContent";
-import { formatCurrency, formatPercent, formatDate, cn } from "@/lib/utils";
-import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { formatCurrency, formatPercent, formatDate, cn, downloadCSV } from "@/lib/utils";
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import type { SortConfig } from "@/types";
 
 const PAGE_SIZE = 8;
@@ -324,9 +324,20 @@ export default function Dashboard() {
           <h2 className="font-heading text-sm font-semibold text-slate-900 dark:text-white">
             Recent Shipments
           </h2>
-          <span className="text-xs text-slate-400 dark:text-slate-500">
-            {tableLoading.isLoading ? "—" : `${filteredShipments.length} results`}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-400 dark:text-slate-500">
+              {tableLoading.isLoading ? "—" : `${filteredShipments.length} results`}
+            </span>
+            <button
+              onClick={() => downloadCSV(paginated as unknown as Record<string, unknown>[], "recent_shipments")}
+              className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-brand dark:hover:text-brand bg-slate-100 dark:bg-white/5 hover:bg-brand/10 dark:hover:bg-brand/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={tableLoading.isLoading || paginated.length === 0}
+              aria-label="Export recent shipments as CSV"
+            >
+              <Download className="h-3.5 w-3.5" aria-hidden="true" />
+              Export
+            </button>
+          </div>
         </div>
 
         {tableLoading.isLoading && tableLoading.variant === "skeleton" ? (

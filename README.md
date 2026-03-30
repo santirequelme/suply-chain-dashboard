@@ -2,7 +2,7 @@
 
 A production-quality, mobile-first supply chain analytics dashboard built with React, TypeScript, Tailwind CSS, and Recharts. The latest UX/UI improvements focus on clearer navigation, stronger visual hierarchy, smarter filtering, and deeper route intelligence for operational decision-making.
 
-## Pencil design file: 03-29suplaychaindesing.pen
+## Pencil design file: 03-29supplychaindesign.pen
 
 ---
 
