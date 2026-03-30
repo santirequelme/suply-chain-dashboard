@@ -305,14 +305,52 @@ function ComponentsSection() {
             </button>
           </div>
         </div>
+
+        <div>
+          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Component Previews</h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <p className="text-xs font-medium text-slate-500">Light Mode</p>
+              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-4">
+                <div className="card p-4 space-y-3 bg-white/80 backdrop-blur-xl border-white/60">
+                  <input type="text" placeholder="Search..." className="input text-sm" />
+                  <div className="flex gap-2">
+                    <button className="btn-primary text-xs py-1.5">Primary</button>
+                    <button className="btn-ghost text-xs py-1.5">Ghost</button>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    <span className="badge bg-brand/20 text-brand border-brand/30">New</span>
+                    <span className="badge bg-success/20 text-success border-success/30">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-xs font-medium text-slate-500">Dark Mode</p>
+              <div className="p-4 rounded-xl border border-white/10 bg-navy-900 space-y-4">
+                <div className="card p-4 space-y-3 bg-navy-900/60 backdrop-blur-xl border-white/10">
+                  <input type="text" placeholder="Search..." className="input text-sm" />
+                  <div className="flex gap-2">
+                    <button className="btn-primary text-xs py-1.5">Primary</button>
+                    <button className="btn-ghost text-xs py-1.5">Ghost</button>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    <span className="badge bg-brand/20 text-brand border-brand/30">New</span>
+                    <span className="badge bg-success/20 text-success border-success/30">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
 function CardsSection() {
-  const darkMode = useAppStore((s) => s.darkMode);
-  
   return (
     <div className={SECTION_CLASS}>
       <div className="space-y-1">
@@ -340,21 +378,59 @@ function CardsSection() {
         </div>
       </div>
       
-      <div className="mt-6">
-        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Glassmorphism Preview</h4>
-        <div className={cn(
-          "p-6 rounded-2xl border transition-all",
-          darkMode 
-            ? "bg-navy-900/60 backdrop-blur-xl border-white/10" 
-            : "bg-white/80 backdrop-blur-xl border-white/60"
-        )}>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-brand/20">
-              <Layers className="w-5 h-5 text-brand" />
+      <div className="mt-8">
+        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Light Mode</h4>
+        <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="card p-4 space-y-2 bg-white/80 backdrop-blur-xl border-white/60">
+              <h5 className="font-semibold text-slate-900">Glass Card</h5>
+              <p className="text-xs text-slate-500">Light glassmorphism</p>
+              <div className="flex gap-1">
+                <span className="badge bg-success/20 text-success border-success/30">Active</span>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-slate-900 dark:text-white">Glassmorphism Effect</p>
-              <p className="text-sm text-slate-500">backdrop-blur with semi-transparent background</p>
+            <div className="card p-4 space-y-2 bg-white/80 backdrop-blur-xl border-white/60">
+              <h5 className="font-semibold text-slate-900">Input Field</h5>
+              <input type="text" placeholder="Search..." className="input text-xs" />
+              <select className="select text-xs w-full"><option>Select</option></select>
+            </div>
+            <div className="card p-4 space-y-2 bg-white/80 backdrop-blur-xl border-white/60">
+              <h5 className="font-semibold text-slate-900">Badges</h5>
+              <div className="flex flex-wrap gap-1">
+                <span className="badge bg-brand/20 text-brand border-brand/30">Brand</span>
+                <span className="badge bg-success/20 text-success border-success/30">Success</span>
+                <span className="badge bg-warning/20 text-warning border-warning/30">Warning</span>
+                <span className="badge bg-danger/20 text-danger border-danger/30">Danger</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mt-6">
+        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Dark Mode</h4>
+        <div className="p-4 rounded-xl border border-white/10 bg-navy-900">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="card p-4 space-y-2 bg-navy-900/60 backdrop-blur-xl border-white/10">
+              <h5 className="font-semibold text-white">Glass Card</h5>
+              <p className="text-xs text-slate-400">Dark glassmorphism</p>
+              <div className="flex gap-1">
+                <span className="badge bg-brand/20 text-brand border-brand/30">Active</span>
+              </div>
+            </div>
+            <div className="card p-4 space-y-2 bg-navy-900/60 backdrop-blur-xl border-white/10">
+              <h5 className="font-semibold text-white">Input Field</h5>
+              <input type="text" placeholder="Search..." className="input text-xs" />
+              <select className="select text-xs w-full"><option>Select</option></select>
+            </div>
+            <div className="card p-4 space-y-2 bg-navy-900/60 backdrop-blur-xl border-white/10">
+              <h5 className="font-semibold text-white">Badges</h5>
+              <div className="flex flex-wrap gap-1">
+                <span className="badge bg-brand/20 text-brand border-brand/30">Brand</span>
+                <span className="badge bg-success/20 text-success border-success/30">Success</span>
+                <span className="badge bg-warning/20 text-warning border-warning/30">Warning</span>
+                <span className="badge bg-danger/20 text-danger border-danger/30">Danger</span>
+              </div>
             </div>
           </div>
         </div>
@@ -364,8 +440,6 @@ function CardsSection() {
 }
 
 function EffectsSection() {
-  const darkMode = useAppStore((s) => s.darkMode);
-  
   return (
     <div className={SECTION_CLASS}>
       <div className="space-y-1">
@@ -406,16 +480,35 @@ function EffectsSection() {
         </div>
         
         <div>
-          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">CSS Variables</h4>
-          <div className={cn(
-            "p-4 rounded-xl font-mono text-xs space-y-2 overflow-x-auto",
-            darkMode ? "bg-navy-950 text-slate-300" : "bg-slate-900 text-slate-300"
-          )}>
+          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">CSS Variables - Light</h4>
+          <div className="p-4 rounded-xl font-mono text-xs space-y-2 overflow-x-auto bg-slate-900 text-slate-300">
             <p><span className="text-brand">:root</span> {'{'}</p>
+            <p className="pl-4 text-slate-400">/* Glassmorphism */</p>
             <p className="pl-4">--glass-bg: rgba(255, 255, 255, 0.82);</p>
             <p className="pl-4">--glass-border: rgba(255, 255, 255, 0.60);</p>
             <p className="pl-4">--glass-blur: blur(20px) saturate(160%);</p>
+            <p className="pl-4 text-slate-400">/* Neumorphism */</p>
             <p className="pl-4">--neu-shadow: 5px 8px 20px rgba(148, 163, 184, 0.38)...;</p>
+            <p className="pl-4">--neu-inset: inset 3px 3px 8px rgba(148, 163, 184, 0.28)...;</p>
+            <p className="pl-4 text-slate-400">/* Colors */</p>
+            <p className="pl-4">--brand: #4318FF;</p>
+            <p className="pl-4">--success: #01B574;</p>
+            <p>{'}'}</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">CSS Variables - Dark</h4>
+          <div className="p-4 rounded-xl font-mono text-xs space-y-2 overflow-x-auto bg-slate-900 text-slate-300">
+            <p><span className="text-brand">.dark</span> {'{'}</p>
+            <p className="pl-4 text-slate-400">/* Glassmorphism */</p>
+            <p className="pl-4">--glass-bg: rgba(15, 21, 53, 0.58);</p>
+            <p className="pl-4">--glass-border: rgba(255, 255, 255, 0.07);</p>
+            <p className="pl-4">--glass-blur: blur(24px) saturate(180%);</p>
+            <p className="pl-4 text-slate-400">/* Neumorphism */</p>
+            <p className="pl-4">--neu-shadow: 4px 6px 18px rgba(0, 0, 0, 0.58)...;</p>
+            <p className="pl-4">--neu-inset: inset 2px 3px 8px rgba(0, 0, 0, 0.52)...;</p>
+            <p className="pl-4 text-slate-400">/* Colors */</p>
             <p className="pl-4">--brand: #4318FF;</p>
             <p className="pl-4">--success: #01B574;</p>
             <p>{'}'}</p>
@@ -594,6 +687,7 @@ function QuickReferenceSection() {
 
 export default function DesignSystem() {
   const darkMode = useAppStore((s) => s.darkMode);
+  const toggleDarkMode = useAppStore((s) => s.toggleDarkMode);
   
   const SECTIONS = [
     { id: "colors", icon: Palette, label: "Colors" },
@@ -608,40 +702,59 @@ export default function DesignSystem() {
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-heading font-bold text-slate-900 dark:text-white">
-              Design System
-            </h1>
-            <p className="text-sm text-slate-500 mt-1">
-              Make2Flow component library and style guide
-            </p>
-          </div>
-          <div className={cn(
-            "px-3 py-1.5 rounded-lg text-xs font-medium",
-            darkMode ? "bg-navy-800 text-brand" : "bg-brand/10 text-brand"
-          )}>
-            {darkMode ? "Dark Mode" : "Light Mode"}
-          </div>
-        </div>
-
-        <nav className="flex flex-wrap gap-2 pb-4 border-b border-slate-200 dark:border-white/10">
-          {SECTIONS.map((section) => (
-            <a
-              key={section.id}
-              href={`#${section.id}`}
+      <div className="sticky top-0 z-10 backdrop-blur-md border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-navy-900/80">
+        <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-heading font-bold text-slate-900 dark:text-white">
+                Design System
+              </h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Make2Flow component library and style guide
+              </p>
+            </div>
+            <button
+              onClick={toggleDarkMode}
               className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
-                "text-slate-600 dark:text-slate-400 hover:text-brand hover:bg-brand/10"
+                "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+                darkMode 
+                  ? "bg-navy-800 text-brand hover:bg-navy-700" 
+                  : "bg-brand/10 text-brand hover:bg-brand/20"
               )}
             >
-              <section.icon className="w-4 h-4" />
-              {section.label}
-            </a>
-          ))}
-        </nav>
+              {darkMode ? (
+                <>
+                  <Sun className="w-4 h-4" />
+                  <span className="hidden sm:inline">Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4" />
+                  <span className="hidden sm:inline">Dark</span>
+                </>
+              )}
+            </button>
+          </div>
 
+          <nav className="flex flex-wrap gap-2 -mx-2 px-2">
+            {SECTIONS.map((section) => (
+              <a
+                key={section.id}
+                href={`#${section.id}`}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
+                  "text-slate-600 dark:text-slate-400 hover:text-brand hover:bg-brand/10"
+                )}
+              >
+                <section.icon className="w-4 h-4" />
+                {section.label}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <div className="space-y-6">
           <div id="colors">
             <ColorPalette />
