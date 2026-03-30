@@ -2,12 +2,18 @@
 
 A production-quality, mobile-first supply chain analytics dashboard built with React, TypeScript, Tailwind CSS, and Recharts. The latest UX/UI improvements focus on clearer navigation, stronger visual hierarchy, smarter filtering, and deeper route intelligence for operational decision-making.
 
+## Live App
+
+- **App**: [https://suply-chain-dashboard.vercel.app/](https://suply-chain-dashboard.vercel.app/)
+- **Design System**: [https://suply-chain-dashboard.vercel.app/design-system](https://suply-chain-dashboard.vercel.app/design-system)
+
 ## Pencil design file: 03-29supplychaindesign.pen
 
 ---
 
 ## Features
 
+- **Design System** — Component library and style guide with colors, typography, components, cards, effects, icons, and spacing reference.
 - **Dashboard** — KPI cards with trend indicators, revenue/shipments area chart, shipments-by-status donut, top facilities bar chart, recent shipments table.
 - **Facilities** — Full data table with sort, pagination, CSV export, and filters by type, status, and region. Utilization progress bars per row.
 - **Suppliers** — Star ratings, on-time delivery trend badges, defect rate color coding, aggregate summary chips.
@@ -56,6 +62,7 @@ Navigation was restructured to follow a clear and logical flow, improving consis
 - **Facilities**: Type distribution, regional breakdown, and linked supplier context.
 - **Products**: Volume trends and full relational visibility.
 - **Shipments**: The most robust page, with advanced filtering, time analysis, detailed operational tables, and routing maps.
+- **Design System**: Component library and style reference (accessible via floating button or Settings).
 - **Settings**: Practical controls that directly affect analytics workflows:
   - **Appearance**: Toggle between Light and Dark mode.
   - **Data Preferences**: System-wide unit selection (Metric vs. Imperial, Weight/Volume units).
