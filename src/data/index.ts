@@ -30,54 +30,126 @@ function genDate(startYear: number, endYear: number, rng: () => number) {
 }
 
 // ─── Static reference data ────────────────────────────────────────────────────
-const COUNTRIES: Record<string, { region: string; cities: string[] }> = {
+const COUNTRIES: Record<string, { region: string; cities: { name: string; lat: number; lng: number }[] }> = {
   "United States": {
     region: "North America",
-    cities: ["Chicago", "Houston", "Los Angeles", "Detroit", "Atlanta"],
+    cities: [
+      { name: "Chicago", lat: 41.88, lng: -87.63 },
+      { name: "Houston", lat: 29.76, lng: -95.37 },
+      { name: "Los Angeles", lat: 34.05, lng: -118.24 },
+      { name: "Detroit", lat: 42.33, lng: -83.05 },
+      { name: "Atlanta", lat: 33.75, lng: -84.39 },
+    ],
   },
   "Germany": {
     region: "Europe",
-    cities: ["Munich", "Frankfurt", "Berlin", "Hamburg", "Stuttgart"],
+    cities: [
+      { name: "Munich", lat: 48.14, lng: 11.58 },
+      { name: "Frankfurt", lat: 50.11, lng: 8.68 },
+      { name: "Berlin", lat: 52.52, lng: 13.41 },
+      { name: "Hamburg", lat: 53.55, lng: 9.99 },
+      { name: "Stuttgart", lat: 48.78, lng: 9.18 },
+    ],
   },
   "China": {
     region: "Asia Pacific",
-    cities: ["Shanghai", "Shenzhen", "Guangzhou", "Beijing", "Tianjin"],
+    cities: [
+      { name: "Shanghai", lat: 31.23, lng: 121.47 },
+      { name: "Shenzhen", lat: 22.54, lng: 114.06 },
+      { name: "Guangzhou", lat: 23.13, lng: 113.26 },
+      { name: "Beijing", lat: 39.90, lng: 116.40 },
+      { name: "Tianjin", lat: 39.08, lng: 117.20 },
+    ],
   },
   "Japan": {
     region: "Asia Pacific",
-    cities: ["Tokyo", "Osaka", "Nagoya", "Yokohama", "Kobe"],
+    cities: [
+      { name: "Tokyo", lat: 35.68, lng: 139.69 },
+      { name: "Osaka", lat: 34.69, lng: 135.50 },
+      { name: "Nagoya", lat: 35.18, lng: 136.91 },
+      { name: "Yokohama", lat: 35.44, lng: 139.64 },
+      { name: "Kobe", lat: 34.69, lng: 135.20 },
+    ],
   },
   "Brazil": {
     region: "Latin America",
-    cities: ["São Paulo", "Rio de Janeiro", "Manaus", "Campinas", "Curitiba"],
+    cities: [
+      { name: "São Paulo", lat: -23.55, lng: -46.63 },
+      { name: "Rio de Janeiro", lat: -22.91, lng: -43.17 },
+      { name: "Manaus", lat: -3.12, lng: -60.02 },
+      { name: "Campinas", lat: -22.91, lng: -47.06 },
+      { name: "Curitiba", lat: -25.43, lng: -49.27 },
+    ],
   },
   "India": {
     region: "Asia Pacific",
-    cities: ["Mumbai", "Chennai", "Pune", "Bengaluru", "Hyderabad"],
+    cities: [
+      { name: "Mumbai", lat: 19.08, lng: 72.88 },
+      { name: "Chennai", lat: 13.08, lng: 80.27 },
+      { name: "Pune", lat: 18.52, lng: 73.86 },
+      { name: "Bengaluru", lat: 12.97, lng: 77.59 },
+      { name: "Hyderabad", lat: 17.38, lng: 78.49 },
+    ],
   },
   "Mexico": {
     region: "Latin America",
-    cities: ["Monterrey", "Guadalajara", "Mexico City", "Tijuana", "Querétaro"],
+    cities: [
+      { name: "Monterrey", lat: 25.67, lng: -100.31 },
+      { name: "Guadalajara", lat: 20.67, lng: -103.35 },
+      { name: "Mexico City", lat: 19.43, lng: -99.13 },
+      { name: "Tijuana", lat: 32.51, lng: -117.04 },
+      { name: "Querétaro", lat: 20.59, lng: -100.39 },
+    ],
   },
   "Canada": {
     region: "North America",
-    cities: ["Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa"],
+    cities: [
+      { name: "Toronto", lat: 43.65, lng: -79.38 },
+      { name: "Vancouver", lat: 49.28, lng: -123.12 },
+      { name: "Montreal", lat: 45.50, lng: -73.57 },
+      { name: "Calgary", lat: 51.05, lng: -114.07 },
+      { name: "Ottawa", lat: 45.42, lng: -75.70 },
+    ],
   },
   "United Kingdom": {
     region: "Europe",
-    cities: ["London", "Birmingham", "Manchester", "Leeds", "Glasgow"],
+    cities: [
+      { name: "London", lat: 51.51, lng: -0.13 },
+      { name: "Birmingham", lat: 52.49, lng: -1.89 },
+      { name: "Manchester", lat: 53.48, lng: -2.24 },
+      { name: "Leeds", lat: 53.80, lng: -1.55 },
+      { name: "Glasgow", lat: 55.86, lng: -4.25 },
+    ],
   },
   "South Korea": {
     region: "Asia Pacific",
-    cities: ["Seoul", "Busan", "Incheon", "Daegu", "Daejeon"],
+    cities: [
+      { name: "Seoul", lat: 37.57, lng: 126.98 },
+      { name: "Busan", lat: 35.18, lng: 129.08 },
+      { name: "Incheon", lat: 37.46, lng: 126.71 },
+      { name: "Daegu", lat: 35.87, lng: 128.60 },
+      { name: "Daejeon", lat: 36.35, lng: 127.38 },
+    ],
   },
   "France": {
     region: "Europe",
-    cities: ["Paris", "Lyon", "Marseille", "Toulouse", "Bordeaux"],
+    cities: [
+      { name: "Paris", lat: 48.86, lng: 2.35 },
+      { name: "Lyon", lat: 45.76, lng: 4.84 },
+      { name: "Marseille", lat: 43.30, lng: 5.37 },
+      { name: "Toulouse", lat: 43.60, lng: 1.44 },
+      { name: "Bordeaux", lat: 44.84, lng: -0.58 },
+    ],
   },
   "Australia": {
     region: "Oceania",
-    cities: ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"],
+    cities: [
+      { name: "Sydney", lat: -33.87, lng: 151.21 },
+      { name: "Melbourne", lat: -37.81, lng: 144.96 },
+      { name: "Brisbane", lat: -27.47, lng: 153.03 },
+      { name: "Perth", lat: -31.95, lng: 115.86 },
+      { name: "Adelaide", lat: -34.93, lng: 138.60 },
+    ],
   },
 };
 
@@ -190,17 +262,20 @@ export const facilities: Facility[] = FACILITY_NAME_PREFIXES.map((prefix, i) => 
   const countryData = COUNTRIES[countryKey];
   const city = countryData.cities[i % countryData.cities.length];
   const supplier = suppliers[i % suppliers.length];
+  // Small jitter so overlapping cities don't perfectly stack
+  const jitterLat = (rng() - 0.5) * 1.5;
+  const jitterLng = (rng() - 0.5) * 1.5;
   return {
     id: `FAC${String(i + 1).padStart(3, "0")}`,
-    name: `${prefix} ${type} ${city}`,
+    name: `${prefix} ${type} ${city.name}`,
     type,
     status: FACILITY_STATUSES[i % FACILITY_STATUSES.length],
     location: {
       country: countryKey,
       region: countryData.region,
-      city,
-      lat: randFloat(-55, 70, 4, rng),
-      lng: randFloat(-180, 180, 4, rng),
+      city: city.name,
+      lat: city.lat + jitterLat,
+      lng: city.lng + jitterLng,
     },
     capacity: randInt(10_000, 500_000, rng),
     utilization: randFloat(45, 97, 1, rng),

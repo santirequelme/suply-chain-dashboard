@@ -128,7 +128,7 @@ export default function Shipments() {
   const [sortKey, setSortKey] = useState("shippedAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [carrierFilter, setCarrierFilter] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<"table" | "map">("table");
+  const [viewMode, setViewMode] = useState<"table" | "map">("map");
   const [selectedRoute, setSelectedRoute] = useState<AggregatedRoute | null>(null);
 
   const kpiLoading = useSectionLoading();

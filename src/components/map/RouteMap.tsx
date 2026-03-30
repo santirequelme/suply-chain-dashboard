@@ -1,23 +1,9 @@
-import { useState, useMemo, useCallback, useRef } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import type { Shipment, Facility } from "@/types";
 import { facilityMap } from "@/data";
 import { formatCurrency, cn } from "@/lib/utils";
-
-// ─── Mercator projection ─────────────────────────────────────────────────────
-const MAP_W = 960;
-const MAP_H = 500;
-const PAD = 40;
-
-function mercatorX(lng: number): number {
-  return PAD + ((lng + 180) / 360) * (MAP_W - PAD * 2);
-}
-
-function mercatorY(lat: number): number {
-  const latRad = (lat * Math.PI) / 180;
-  const mercN = Math.log(Math.tan(Math.PI / 4 + latRad / 2));
-  const yNorm = (1 - mercN / Math.PI) / 2;
-  return PAD + yNorm * (MAP_H - PAD * 2);
-}
+import { ComposableMap, Geographies, Geography, Marker, Line } from "react-simple-maps";
+import geoData from "@/data/features.json";
 
 // ─── Status colors ───────────────────────────────────────────────────────────
 const STATUS_COLORS: Record<string, string> = {
@@ -36,33 +22,8 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: "Cancelled",
 };
 
-// ─── Simplified world outline paths (major landmasses) ───────────────────────
-// Using a highly simplified set of continent outlines for visual reference
-const WORLD_PATHS = [
-  // North America
-  "M130,100 L200,80 L260,90 L280,120 L260,160 L240,180 L200,200 L180,220 L160,200 L140,170 L120,140 Z",
-  // South America
-  "M200,230 L220,240 L240,260 L240,300 L230,340 L210,370 L190,360 L180,320 L175,280 L185,250 Z",
-  // Europe
-  "M440,90 L470,80 L500,85 L510,100 L500,120 L490,140 L470,130 L450,120 L440,110 Z",
-  // Africa
-  "M440,160 L480,150 L510,170 L520,210 L510,260 L490,300 L470,310 L450,290 L440,250 L430,210 L435,180 Z",
-  // Asia
-  "M520,70 L580,60 L650,65 L720,80 L740,100 L730,130 L700,150 L660,140 L620,120 L580,130 L540,140 L520,120 L510,100 Z",
-  // India
-  "M600,150 L620,155 L630,180 L620,210 L600,220 L590,200 L585,170 Z",
-  // Southeast Asia
-  "M660,160 L690,150 L710,165 L700,190 L680,200 L660,185 Z",
-  // Australia
-  "M700,280 L750,270 L780,280 L790,300 L770,330 L740,340 L710,320 L700,300 Z",
-  // Japan/Korea
-  "M730,95 L735,85 L738,100 L732,110 Z",
-  // UK
-  "M440,88 L445,80 L448,90 L443,95 Z",
-];
-
 // ─── Aggregate routes ────────────────────────────────────────────────────────
-interface AggregatedRoute {
+export interface AggregatedRoute {
   key: string;
   originId: string;
   destId: string;
@@ -113,27 +74,6 @@ function aggregateRoutes(shipments: Shipment[]): AggregatedRoute[] {
   return Array.from(map.values());
 }
 
-// ─── Curved path between two points ─────────────────────────────────────────
-function curvedPath(
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number
-): string {
-  const midX = (x1 + x2) / 2;
-  const midY = (y1 + y2) / 2;
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-  const curvature = Math.min(dist * 0.3, 60);
-  // Perpendicular offset for the control point
-  const nx = -dy / dist;
-  const ny = dx / dist;
-  const cx = midX + nx * curvature;
-  const cy = midY + ny * curvature;
-  return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
-}
-
 // ─── Tooltip ─────────────────────────────────────────────────────────────────
 interface TooltipData {
   x: number;
@@ -149,10 +89,7 @@ interface RouteMapProps {
   className?: string;
 }
 
-export type { AggregatedRoute };
-
 export default function RouteMap({ shipments, onRouteClick, className }: RouteMapProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const [hoveredRoute, setHoveredRoute] = useState<string | null>(null);
   const [hoveredFacility, setHoveredFacility] = useState<string | null>(null);
@@ -196,19 +133,30 @@ export default function RouteMap({ shipments, onRouteClick, className }: RouteMa
 
   const getTooltipPosition = useCallback(
     (e: React.MouseEvent) => {
-      if (!svgRef.current) return { x: 0, y: 0 };
-      const rect = svgRef.current.getBoundingClientRect();
+      const parentRect = e.currentTarget.closest('.map-container')?.getBoundingClientRect();
+      if (!parentRect) return { x: e.clientX, y: e.clientY };
       return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: e.clientX - parentRect.left,
+        y: e.clientY - parentRect.top,
       };
     },
     []
   );
 
   return (
-    <div className={cn("card overflow-hidden relative", className)}>
-      <div className="px-5 py-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+    <div className={cn("card overflow-hidden relative map-container", className)}>
+      <style>
+        {`
+          @keyframes route-pulse {
+            from { stroke-dashoffset: 24; }
+            to { stroke-dashoffset: 0; }
+          }
+          .route-animated {
+            animation: route-pulse 1.5s linear infinite;
+          }
+        `}
+      </style>
+      <div className="px-5 py-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between z-10 relative bg-white/50 dark:bg-navy-800/50 backdrop-blur-sm">
         <div>
           <p className="text-sm font-semibold text-slate-900 dark:text-white">
             Route Intelligence Map
@@ -231,124 +179,106 @@ export default function RouteMap({ shipments, onRouteClick, className }: RouteMa
         </div>
       </div>
 
-      <div className="relative overflow-hidden">
-        <svg
-          ref={svgRef}
-          viewBox={`0 0 ${MAP_W} ${MAP_H}`}
+      <div className="relative overflow-hidden bg-slate-50 dark:bg-[#0B1023]">
+        <ComposableMap
+          projectionConfig={{
+            scale: 140,
+            center: [0, 20]
+          }}
+          height={500}
+          width={960}
           className="w-full h-auto"
-          style={{ minHeight: 300, maxHeight: 520 }}
-          role="img"
-          aria-label="Shipment route map showing origin and destination facilities"
+          style={{ minHeight: 300, maxHeight: 600 }}
         >
-          {/* Background */}
-          <rect width={MAP_W} height={MAP_H} className="fill-slate-50 dark:fill-[#0B1023]" rx={8} />
+          {/* Map Base */}
+          <Geographies geography={geoData}>
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  className="fill-slate-200/80 dark:fill-white/[0.04] stroke-slate-300/80 dark:stroke-white/[0.06]"
+                  strokeWidth={0.5}
+                  style={{
+                    default: { outline: "none" },
+                    hover:   { outline: "none" },
+                    pressed: { outline: "none" },
+                  }}
+                />
+              ))
+            }
+          </Geographies>
 
-          {/* Grid lines */}
-          {Array.from({ length: 7 }, (_, i) => {
-            const x = PAD + (i * (MAP_W - PAD * 2)) / 6;
-            return (
-              <line
-                key={`vg-${i}`}
-                x1={x} y1={PAD} x2={x} y2={MAP_H - PAD}
-                className="stroke-slate-200/50 dark:stroke-white/[0.04]"
-                strokeWidth={0.5}
-              />
-            );
-          })}
-          {Array.from({ length: 5 }, (_, i) => {
-            const y = PAD + (i * (MAP_H - PAD * 2)) / 4;
-            return (
-              <line
-                key={`hg-${i}`}
-                x1={PAD} y1={y} x2={MAP_W - PAD} y2={y}
-                className="stroke-slate-200/50 dark:stroke-white/[0.04]"
-                strokeWidth={0.5}
-              />
-            );
-          })}
-
-          {/* World landmass outlines */}
-          {WORLD_PATHS.map((d, i) => (
-            <path
-              key={`land-${i}`}
-              d={d}
-              className="fill-slate-200/60 dark:fill-white/[0.06] stroke-slate-300/50 dark:stroke-white/[0.08]"
-              strokeWidth={0.5}
-            />
-          ))}
-
-          {/* Route lines */}
+          {/* Routes */}
           {routes.map((route) => {
-            const x1 = mercatorX(route.origin.location.lng);
-            const y1 = mercatorY(route.origin.location.lat);
-            const x2 = mercatorX(route.dest.location.lng);
-            const y2 = mercatorY(route.dest.location.lat);
-            const d = curvedPath(x1, y1, x2, y2);
+            const originCoords: [number, number] = [route.origin.location.lng, route.origin.location.lat];
+            const destCoords: [number, number] = [route.dest.location.lng, route.dest.location.lat];
             const color = STATUS_COLORS[route.dominantStatus] ?? "#94A3B8";
-            const thickness = 1 + (route.totalQuantity / maxRouteQty) * 3.5;
+            const thickness = 1.2 + (route.totalQuantity / maxRouteQty) * 3.5;
             const isHovered = hoveredRoute === route.key;
 
             return (
               <g key={route.key}>
-                {/* Glow on hover */}
-                {isHovered && (
-                  <path
-                    d={d}
-                    fill="none"
-                    stroke={color}
-                    strokeWidth={thickness + 4}
-                    strokeOpacity={0.25}
-                    strokeLinecap="round"
-                  />
-                )}
-                <path
-                  d={d}
-                  fill="none"
+                {/* Background Line */}
+                <Line
+                  from={originCoords}
+                  to={destCoords}
                   stroke={color}
                   strokeWidth={isHovered ? thickness + 1 : thickness}
-                  strokeOpacity={isHovered ? 0.9 : 0.55}
+                  strokeOpacity={isHovered ? 0.6 : 0.25}
                   strokeLinecap="round"
-                  strokeDasharray={route.dominantStatus === "pending" ? "6 4" : undefined}
                   className="cursor-pointer transition-opacity"
-                  onMouseEnter={(e) => {
+                  onMouseEnter={(e: any) => {
                     setHoveredRoute(route.key);
                     setTooltip({ ...getTooltipPosition(e), route });
                   }}
-                  onMouseMove={(e) => setTooltip({ ...getTooltipPosition(e), route })}
+                  onMouseMove={(e: any) => setTooltip({ ...getTooltipPosition(e), route })}
                   onMouseLeave={() => {
                     setHoveredRoute(null);
                     setTooltip(null);
                   }}
                   onClick={() => onRouteClick(route)}
                 />
-                {/* Arrowhead direction indicator */}
-                <circle
-                  cx={x2}
-                  cy={y2}
-                  r={2}
-                  fill={color}
-                  opacity={0.7}
-                  pointerEvents="none"
+
+                {/* Animated Particles / Dashes for In Transit shipments */}
+                <Line
+                  from={originCoords}
+                  to={destCoords}
+                  stroke={color}
+                  strokeWidth={isHovered ? thickness + 1 : thickness}
+                  strokeOpacity={route.dominantStatus === "pending" ? 0.3 : 0.8}
+                  strokeLinecap="round"
+                  strokeDasharray={route.dominantStatus === "pending" ? "4 6" : "2 10"}
+                  className={cn("pointer-events-none", route.dominantStatus !== "pending" && "route-animated")}
                 />
               </g>
             );
           })}
 
-          {/* Facility nodes */}
+          {/* Markers (Facilities) */}
           {activeFacilities.map((f) => {
-            const x = mercatorX(f.location.lng);
-            const y = mercatorY(f.location.lat);
+            const coords: [number, number] = [f.location.lng, f.location.lat];
             const count = facilityCounts.get(f.id) ?? 1;
             const r = 3 + (count / maxCount) * 5;
             const isHovered = hoveredFacility === f.id;
 
             return (
-              <g key={f.id}>
+              <Marker
+                key={f.id}
+                coordinates={coords}
+                onMouseEnter={(e: any) => {
+                  setHoveredFacility(f.id);
+                  setTooltip({ ...getTooltipPosition(e), facility: f });
+                }}
+                onMouseMove={(e: any) => setTooltip({ ...getTooltipPosition(e), facility: f })}
+                onMouseLeave={() => {
+                  setHoveredFacility(null);
+                  setTooltip(null);
+                }}
+              >
                 {/* Pulse ring on hover */}
                 {isHovered && (
                   <circle
-                    cx={x}
-                    cy={y}
                     r={r + 6}
                     fill="none"
                     stroke="#4318FF"
@@ -371,36 +301,26 @@ export default function RouteMap({ shipments, onRouteClick, className }: RouteMa
                     />
                   </circle>
                 )}
+                {/* Core facility node */}
                 <circle
-                  cx={x}
-                  cy={y}
                   r={isHovered ? r + 1.5 : r}
                   className="fill-brand stroke-white dark:stroke-navy-900 cursor-pointer"
                   strokeWidth={1.5}
                   opacity={isHovered ? 1 : 0.85}
-                  onMouseEnter={(e) => {
-                    setHoveredFacility(f.id);
-                    setTooltip({ ...getTooltipPosition(e), facility: f });
-                  }}
-                  onMouseMove={(e) => setTooltip({ ...getTooltipPosition(e), facility: f })}
-                  onMouseLeave={() => {
-                    setHoveredFacility(null);
-                    setTooltip(null);
-                  }}
                 />
-              </g>
+              </Marker>
             );
           })}
-        </svg>
+        </ComposableMap>
 
         {/* Tooltip overlay */}
         {tooltip && (
           <div
-            className="absolute z-50 pointer-events-none"
+            className="absolute z-50 pointer-events-none transition-transform duration-75"
             style={{
-              left: Math.min(tooltip.x + 12, MAP_W - 200),
+              left: Math.min(tooltip.x + 12, 960 - 200),
               top: tooltip.y - 10,
-              transform: tooltip.x > MAP_W * 0.7 ? "translateX(-110%)" : undefined,
+              transform: tooltip.x > 960 * 0.7 ? "translateX(-110%)" : "translateX(0)",
             }}
           >
             <div className="bg-white dark:bg-navy-800 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 shadow-xl text-xs min-w-[160px]">
