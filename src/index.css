@@ -442,3 +442,62 @@
 .dark .tr:hover > .td:first-child {
   box-shadow: inset 3px 0 0 rgba(134, 140, 255, 0.60);
 }
+
+/* ─── Revenue Card Wave Animation ───────────────────────────────────────── */
+.revenue-wave-card {
+  background: linear-gradient(135deg, #0f172a 0%, #172554 100%);
+}
+
+/* Base glowing core inside the card */
+.revenue-wave-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 80% 120%, rgba(67, 24, 255, 0.45) 0%, transparent 60%);
+  z-index: 0;
+}
+
+/* The moving fluid waves overlapping each other */
+.revenue-wave {
+  position: absolute;
+  width: 250%;
+  height: 250%;
+  border-radius: 43% 57% 53% 47% / 43% 45% 55% 57%;
+  transform-origin: 50% 50%;
+  animation: wave-flow 15s linear infinite;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 0;
+}
+
+.revenue-wave.wave-1 {
+  top: -120%;
+  left: -50%;
+  animation-duration: 22s;
+  background: linear-gradient(45deg, rgba(67, 24, 255, 0.3) 0%, rgba(139, 92, 246, 0.15) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Shiny edges mimicking fluid layers */
+}
+
+.revenue-wave.wave-2 {
+  top: -100%;
+  left: -30%;
+  animation-duration: 18s;
+  animation-direction: reverse;
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.25) 0%, rgba(56, 189, 248, 0.1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.revenue-wave.wave-3 {
+  top: -150%;
+  left: -40%;
+  animation-duration: 25s;
+  background: linear-gradient(225deg, rgba(168, 85, 247, 0.2) 0%, transparent 80%);
+  border-radius: 48% 52% 42% 58% / 54% 51% 49% 46%;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@keyframes wave-flow {
+  0% { transform: rotate(0deg) scale(1.0); }
+  50% { transform: rotate(180deg) scale(1.02); }
+  100% { transform: rotate(360deg) scale(1.0); }
+}

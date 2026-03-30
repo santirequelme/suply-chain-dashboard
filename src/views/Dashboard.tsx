@@ -120,6 +120,7 @@ export default function Dashboard() {
   const kpis = [
     {
       label: "Revenue",
+      variant: "revenue" as const,
       value: formatCurrency(filteredRevTotal, true),
       subValue: formatPercent(stats.onTimeRate) + " on-time",
       trend: 12.4,
